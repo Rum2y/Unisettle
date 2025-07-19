@@ -1,0 +1,277 @@
+import {
+  View,
+  Platform,
+  FlatList,
+  Text,
+  KeyboardAvoidingView,
+  RefreshControl,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
+import { AnimatedFAB, Searchbar } from "react-native-paper";
+import { router } from "expo-router";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { LinearGradientComponent } from "@/components/gradient";
+import { categories } from "../businesses/[biz]";
+import BusinessCards from "@/components/businessCards";
+import Filters from "@/components/filter";
+import React from "react";
+import { Query } from "react-native-appwrite";
+import debounce from "lodash.debounce";
+import { useAuth } from "../context/auth-context";
+import getImages from "../managebusiness/filePreview";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AuthModal from "@/components/modal";
+import { BUSINESSESCOLLECTIONID, DATABASEID, databases } from "@/lib/appwrite";
+
+const business = () => {
+  const [isExtended, setIsExtended] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [businesses, setBusinesses] = useState<any[] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const isIOS = Platform.OS === "ios";
+  const { user } = useAuth();
+
+  const add = () => {
+    setIsExtended(!isExtended);
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    if (isExtended) router.push("/businesses/addBusiness" as any);
+  };
+
+  const fetchBusinesses = async () => {
+    try {
+      setLoading(true);
+      const filters = [];
+
+      // Apply filters based on selected category
+      if (selectedCategory !== "All") {
+        filters.push(Query.equal("category", selectedCategory));
+      }
+
+      // Apply search query if provided
+      if (searchQuery.trim() !== "") {
+        filters.push(Query.search("name", searchQuery.trim()));
+      }
+
+      const response = await databases.listDocuments(
+        DATABASEID,
+        BUSINESSESCOLLECTIONID,
+        filters
+      );
+
+      const businessesWithImages = await Promise.all(
+        response.documents.map(async (business) => {
+          if (business.images && Array.isArray(business.images)) {
+            const previewUrls = await getImages(business, true);
+
+            return {
+              ...business,
+              images: previewUrls.filter(Boolean), // filter out failed ones
+            };
+          }
+
+          return business;
+        })
+      );
+
+      setBusinesses(businessesWithImages);
+
+      //Fetch Bookmarks
+    } catch (error) {
+      console.error("Error fetching businesses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusinesses();
+  }, [selectedCategory, searchQuery]);
+
+  const onRefresh = async () => {
+    setRefresh(true);
+    await fetchBusinesses();
+    setRefresh(false);
+  };
+
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      setSearchQuery(query);
+    }, 500),
+    []
+  );
+
+  const handleSearchChange = (text: string) => {
+    setSearchInput(text);
+    debouncedSearch(text);
+  };
+
+  const headerComponent = useMemo(() => {
+    return (
+      <View className="mb-4">
+        <Searchbar
+          placeholder="Search for businesses"
+          value={searchInput}
+          onChangeText={handleSearchChange}
+          inputStyle={{
+            textAlignVertical: "center", // For Android
+            minHeight: "100%",
+            includeFontPadding: false,
+          }}
+          style={{
+            marginVertical: 8,
+            height: 48,
+            backgroundColor: "white",
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: "#e5e7eb",
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.05,
+            shadowRadius: 2,
+            elevation: 2, // Android shadow
+          }}
+        />
+        <Categories
+          categories={categories}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
+      </View>
+    );
+  }, [searchInput, selectedCategory]);
+
+  return (
+    <View className="flex-1 p-4 ">
+      <LinearGradientComponent />
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <FlatList
+          data={businesses}
+          keyExtractor={(item) => item.$id}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refresh}
+              onRefresh={onRefresh}
+              colors={["#0d9488"]} // For Android: spinner color(s)
+              tintColor="#0d9488" // For iOS: spinner color
+            />
+          }
+          onScrollBeginDrag={() => {
+            if (isExtended) setIsExtended(false);
+          }}
+          renderItem={({ item, index }) => (
+            <BusinessCards
+              biz={item}
+              idx={index}
+              refreshReviews={refresh}
+              manage={true}
+            />
+          )}
+          ListHeaderComponent={headerComponent}
+          ListEmptyComponent={() =>
+            loading ? (
+              <View className="flex-1 justify-center items-center mt-10">
+                <ActivityIndicator animating={true} size="large" color="teal" />
+              </View>
+            ) : (
+              <View className="flex-1 justify-center items-center mt-10 px-4">
+                <MaterialCommunityIcons
+                  name="store-remove-outline"
+                  size={64}
+                  color="#9ca3af"
+                  style={{ marginBottom: 16 }}
+                />
+                <Text className="text-lg font-medium text-gray-500 mb-1 text-center">
+                  No businesses found
+                </Text>
+                <Text className="text-sm text-gray-400 text-center">
+                  {searchQuery || selectedCategory !== "All"
+                    ? "Try adjusting your search or filters"
+                    : "Be the first to add a business in your area!"}
+                </Text>
+                {!searchQuery && selectedCategory === "All" && (
+                  <Pressable
+                    onPress={add}
+                    className="mt-4 px-6 py-2 bg-teal-100 rounded-full"
+                  >
+                    <Text className="text-teal-700 font-medium">
+                      Add Business
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
+            )
+          }
+        />
+      </KeyboardAvoidingView>
+      <AuthModal
+        visible={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
+      <AnimatedFAB
+        icon="plus"
+        label="Add Business "
+        extended={isExtended}
+        onPress={add}
+        animateFrom="right"
+        iconMode="static"
+        color="white"
+        style={{
+          position: "absolute",
+          bottom: 16,
+          right: 16,
+          backgroundColor: "teal",
+          elevation: isIOS ? 0 : 6,
+        }}
+      />
+    </View>
+  );
+};
+
+type CategoriesProps = {
+  categories: string[];
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+};
+
+const Categories = ({
+  categories,
+  selectedCategory,
+  setSelectedCategory,
+}: CategoriesProps) => {
+  return (
+    <FlatList
+      data={["All", ...categories]}
+      keyExtractor={(item: string) => item}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      renderItem={({ item }: { item: string }) => (
+        <View className="mr-2">
+          <Filters
+            key={item}
+            label={item}
+            selected={item === selectedCategory}
+            func={() => setSelectedCategory(item)}
+          />
+        </View>
+      )}
+    />
+  );
+};
+export default business;

@@ -1,0 +1,83 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs, useSegments, router } from "expo-router";
+import React, { useEffect } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import { useAuth } from "../context/auth-context";
+
+const _layout = () => {
+  // const { user, isLoading } = useAuth();
+  // const segments = useSegments();
+
+  // useEffect(() => {
+  //   const isAuthRoute = segments[0] === "auth";
+
+  //   if (isLoading) return; // Don't do anything until loading is done
+
+  //   if (!user && !isAuthRoute) {
+  //     router.replace("/auth");
+  //   } else if (user && isAuthRoute) {
+  //     router.replace("/(tabs)");
+  //   }
+  // }, [segments, user, isLoading]);
+
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "teal",
+        headerStyle: {
+          backgroundColor: "#E0F7FA",
+          shadowColor: "transparent",
+        },
+        headerTintColor: "#005965",
+
+        headerTitleAlign: "center",
+        headerTitleStyle: {
+          fontWeight: "bold",
+          textAlignVertical: "center",
+          fontSize: 20,
+        },
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => router.push("/profile/profile")}
+            style={{ marginRight: 20 }}
+          >
+            <Ionicons name="person-circle-outline" size={30} color="#005965" />
+          </TouchableOpacity>
+        ),
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          tabBarLabel: "Home",
+          title: "Welcome",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="business"
+        options={{
+          title: "Find Business",
+          tabBarLabel: "Business",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="business" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="guide"
+        options={{
+          title: "Tips & Guide",
+          tabBarLabel: "Guide",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="book" color={color} size={size} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+};
+
+export default _layout;
