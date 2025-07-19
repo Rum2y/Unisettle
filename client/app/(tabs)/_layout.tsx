@@ -1,25 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs, useSegments, router } from "expo-router";
-import React, { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { useAuth } from "../context/auth-context";
+import { router, Tabs } from "expo-router";
+import React from "react";
+import { TouchableOpacity } from "react-native";
 
 const _layout = () => {
-  // const { user, isLoading } = useAuth();
-  // const segments = useSegments();
-
-  // useEffect(() => {
-  //   const isAuthRoute = segments[0] === "auth";
-
-  //   if (isLoading) return; // Don't do anything until loading is done
-
-  //   if (!user && !isAuthRoute) {
-  //     router.replace("/auth");
-  //   } else if (user && isAuthRoute) {
-  //     router.replace("/(tabs)");
-  //   }
-  // }, [segments, user, isLoading]);
-
   return (
     <Tabs
       screenOptions={{
