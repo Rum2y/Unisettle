@@ -1,18 +1,17 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  View,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   Alert,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
+  ScrollView,
+  View,
 } from "react-native";
 import { Button, Text, TextInput, useTheme } from "react-native-paper";
-import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth-context";
-import { useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
 const AuthScreen = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -95,7 +94,6 @@ const AuthScreen = () => {
         if (err?.message?.includes("verify")) {
           setError("Please verify your email before signing in.");
         } else {
-          console.error(err);
           setError("Sign In failed. Please check your credentials.");
         }
       }
@@ -269,20 +267,23 @@ const AuthScreen = () => {
         onRequestClose={handleSuccessModalClose}
       >
         <View className="flex-1 justify-center items-center bg-black/50 p-6">
-          <View className="bg-white rounded-xl p-6 w-full max-w-md">
+          <View className="bg-white rounded-xl p-6 w-full max-w-md ">
             <View className="items-center mb-4">
               <View className="bg-teal-100 p-4 rounded-full">
                 <Ionicons name="checkmark-circle" size={48} color="#0d9488" />
               </View>
             </View>
 
-            <Text className="text-2xl font-bold text-teal-800 text-center mb-2">
-              Account Created!
-            </Text>
-            <Text className="text-gray-600 text-center mb-4">
-              Check your email for a verification link to complete your
-              registration.
-            </Text>
+            {/* Centered text block */}
+            <View className="items-center justify-center mb-4 w-full">
+              <Text className="text-2xl font-bold text-teal-800 text-center mb-2">
+                Account Created!
+              </Text>
+              <Text className="text-gray-600 text-center w-full">
+                Check your email for a verification link to complete your
+                registration.
+              </Text>
+            </View>
 
             <Button
               mode="contained"

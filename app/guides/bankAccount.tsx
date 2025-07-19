@@ -1,14 +1,14 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  Linking,
-  StyleSheet,
-} from "react-native";
-import React from "react";
-import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React from "react";
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 interface Step {
   icon: string;
@@ -192,7 +192,7 @@ const BankAccount: React.FC<BankAccountProps> = (content) => {
 
       <Pressable
         onPress={() => Linking.openURL(content.secondaryButton.url)}
-        className="bg-gray-100 py-3 rounded-xl items-center"
+        className="bg-gray-100 py-3 rounded-xl items-center mb-[3rem]"
       >
         <Text className="text-teal-700 font-semibold">
           {content.secondaryButton.label}

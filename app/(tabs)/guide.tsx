@@ -29,6 +29,16 @@ export default function GuideScreen() {
         { label: "Saving Money", icon: "cash", route: "saving-money" },
       ],
     },
+    {
+      title: "Optional Tips",
+      items: [
+        {
+          label: "Public Library Card",
+          icon: "book",
+          route: "public-library-card",
+        },
+      ],
+    },
   ];
 
   return (

@@ -1,19 +1,18 @@
 // AddBusinessForm.tsx
+import albertaCities from "@/albertaCities";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
-  View,
-  Text,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
   TextInput,
   TouchableOpacity,
-  Image,
+  View,
 } from "react-native";
 import { Button } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
-import RNPickerSelect from "react-native-picker-select";
-import albertaCities from "@/albertaCities";
-import { useState } from "react";
 
 const AddBusinessForm = ({
   mode,
@@ -29,8 +28,6 @@ const AddBusinessForm = ({
   setContactIG,
   contactPhone,
   setContactPhone,
-  isStudentOwned,
-  setIsStudentOwned,
   selectedCity,
   setSelectedCity,
   images,
@@ -53,8 +50,7 @@ const AddBusinessForm = ({
   setContactIG: (text: string) => void;
   contactPhone: string;
   setContactPhone: (text: string) => void;
-  isStudentOwned: boolean;
-  setIsStudentOwned: (value: boolean) => void;
+
   selectedCity: string;
   setSelectedCity: (city: string) => void;
   images: { id?: string; uri: string }[];
@@ -252,19 +248,7 @@ const AddBusinessForm = ({
           </View>
         </View>
         {/* Student Owned Toggle */}
-        <View className="mb-6 flex-row items-center">
-          <TouchableOpacity
-            onPress={() => setIsStudentOwned(!isStudentOwned)}
-            className={`w-5 h-5 rounded-md mr-2 border-2 ${
-              isStudentOwned ? "bg-teal-600 border-teal-600" : "border-gray-400"
-            } items-center justify-center`}
-          >
-            {isStudentOwned && (
-              <Ionicons name="checkmark" size={14} color="white" />
-            )}
-          </TouchableOpacity>
-          <Text className="text-sm text-gray-700">Student-owned business</Text>
-        </View>
+
         {/* Submit Button */}
         <Button
           mode="contained"

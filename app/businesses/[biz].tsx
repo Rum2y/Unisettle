@@ -1,12 +1,4 @@
 // AddBusiness.tsx
-import { Alert } from "react-native";
-import { router } from "expo-router";
-import { useState, useEffect } from "react";
-import { useLocalSearchParams } from "expo-router";
-import { useAuth } from "../context/auth-context";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import getImages from "../managebusiness/filePreview";
 import {
   BUSINESSESCOLLECTIONID,
   BUSINESSIMAGESBUCKETID,
@@ -14,9 +6,16 @@ import {
   databases,
   storage,
 } from "@/lib/appwrite";
+import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
+import { router, useLocalSearchParams } from "expo-router";
 import mime from "mime";
+import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import { ID } from "react-native-appwrite";
+import { useAuth } from "../context/auth-context";
 import AddBusinessForm from "../managebusiness/businessForm";
+import getImages from "../managebusiness/filePreview";
 
 export const categories = [
   "Barber",
@@ -69,7 +68,6 @@ const AddBusiness = () => {
   const [location, setLocation] = useState("");
   const [contactIG, setContactIG] = useState("");
   const [contactPhone, setContactPhone] = useState("");
-  const [isStudentOwned, setIsStudentOwned] = useState(false);
   const [images, setImages] = useState<{ id?: string; uri: string }[]>([]);
   const [selectedCity, setSelectedCity] = useState("");
 
@@ -134,7 +132,6 @@ const AddBusiness = () => {
             setLocation(document.location || "");
             setContactIG(document.instagram || "");
             setContactPhone(document.phoneNumber || "");
-            setIsStudentOwned(document.studentOwned || false);
             setImages(document.images || []);
             setSelectedCity(document.city || "");
 
@@ -191,7 +188,6 @@ const AddBusiness = () => {
         location: location,
         instagram: contactIG === "" ? "N/A" : contactIG,
         phoneNumber: contactPhone,
-        studentOwned: isStudentOwned ? true : false,
         images: uploadedFileIds,
         userID: user.$id,
         city: selectedCity,
@@ -223,7 +219,6 @@ const AddBusiness = () => {
       setLocation("");
       setContactIG("");
       setContactPhone("");
-      setIsStudentOwned(false);
       setImages([]);
       setSelectedCity("Enter your city");
       router.push("/(tabs)/business");
@@ -249,8 +244,6 @@ const AddBusiness = () => {
       setContactIG={setContactIG}
       contactPhone={contactPhone}
       setContactPhone={setContactPhone}
-      isStudentOwned={isStudentOwned}
-      setIsStudentOwned={setIsStudentOwned}
       selectedCity={selectedCity}
       setSelectedCity={setSelectedCity}
       images={images}

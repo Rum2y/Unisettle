@@ -1,19 +1,19 @@
-import {
-  View,
-  Text,
-  Pressable,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  RefreshControl,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import { Button } from "react-native-paper";
+import BusinessCards from "@/components/businessCards";
 import { LinearGradientComponent } from "@/components/gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import BusinessCards from "@/components/businessCards";
+import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Button } from "react-native-paper";
 
 type Business = {
   $id: string;
@@ -121,7 +121,7 @@ const Manage: React.FC<ManageProps> = ({
               </View>
             )}
             ListFooterComponent={() =>
-              edit ? (
+              edit && businesses.length > 0 ? (
                 <View className="mt-6 px-4">
                   <Button
                     mode="outlined"

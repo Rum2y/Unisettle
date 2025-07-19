@@ -1,28 +1,27 @@
-import {
-  View,
-  Platform,
-  FlatList,
-  Text,
-  KeyboardAvoidingView,
-  RefreshControl,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
-import { AnimatedFAB, Searchbar } from "react-native-paper";
-import { router } from "expo-router";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { LinearGradientComponent } from "@/components/gradient";
-import { categories } from "../businesses/[biz]";
 import BusinessCards from "@/components/businessCards";
 import Filters from "@/components/filter";
-import React from "react";
-import { Query } from "react-native-appwrite";
-import debounce from "lodash.debounce";
-import { useAuth } from "../context/auth-context";
-import getImages from "../managebusiness/filePreview";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradientComponent } from "@/components/gradient";
 import AuthModal from "@/components/modal";
 import { BUSINESSESCOLLECTIONID, DATABASEID, databases } from "@/lib/appwrite";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import debounce from "lodash.debounce";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  RefreshControl,
+  Text,
+  View,
+} from "react-native";
+import { Query } from "react-native-appwrite";
+import { AnimatedFAB, Searchbar } from "react-native-paper";
+import { categories } from "../businesses/[biz]";
+import { useAuth } from "../context/auth-context";
+import getImages from "../managebusiness/filePreview";
 
 const business = () => {
   const [isExtended, setIsExtended] = useState(false);
