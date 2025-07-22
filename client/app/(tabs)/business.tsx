@@ -34,7 +34,7 @@ const business = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const isIOS = Platform.OS === "ios";
-  const { user } = useAuth();
+  const { user, isSubscribed } = useAuth();
 
   const add = () => {
     setIsExtended(!isExtended);
@@ -42,7 +42,12 @@ const business = () => {
       setShowAuthModal(true);
       return;
     }
-    if (isExtended) router.push("/businesses/addBusiness" as any);
+
+    //Check if already subscribed
+    if (isExtended) {
+      if (isSubscribed) router.push("/businesses/addBusiness");
+      else router.push("/paymentPlans/paymentplan");
+    }
   };
 
   const fetchBusinesses = async () => {

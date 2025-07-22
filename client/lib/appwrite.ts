@@ -1,4 +1,10 @@
-import { Client, Databases, Account, Storage } from "react-native-appwrite";
+import {
+  Client,
+  Databases,
+  Account,
+  Storage,
+  Functions,
+} from "react-native-appwrite";
 
 const client = new Client();
 client
@@ -9,6 +15,7 @@ client
 export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
+export const functions = new Functions(client);
 
 export const DATABASEID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!;
 const GUIDESCOLLECTIONID =
@@ -29,6 +36,8 @@ export const BUSINESSIMAGESBUCKETID =
   process.env.EXPO_PUBLIC_APPWRITE_BUSINESS_IMAGES_BUCKET_ID!;
 export const FEEDBACKCOLLECTIONID =
   process.env.EXPO_PUBLIC_APPWRITE_FEEDBACK_COLLECTION_ID!;
+export const BUSINESS_SUBSCRIPTIONS_COLLECTION_ID =
+  process.env.EXPO_PUBLIC_APPWRITE_BUSINESS_SUBSCRIPTIONS_COLLECTION_ID!;
 
 function safeParse(jsonString: string | null | undefined) {
   if (!jsonString) return undefined;
