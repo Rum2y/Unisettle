@@ -16,7 +16,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
-  const [language, setLanguage] = useState("English");
 
   const handleSignOut = () => {
     Alert.alert(
@@ -43,6 +42,24 @@ const Profile = () => {
   const handleSignIn = () => {
     router.push("/../authentication/auth" as any);
   };
+
+  const options = [
+    {
+      text: "Manage My Businesses",
+      icon: "business" as React.ComponentProps<typeof Ionicons>["name"],
+      route: "/managebusiness/manageBusiness",
+    },
+    {
+      text: "Bookmarks",
+      icon: "bookmark" as React.ComponentProps<typeof Ionicons>["name"],
+      route: "/managebusiness/savedBusiness",
+    },
+    {
+      text: "Manage Subscriptions",
+      icon: "card" as React.ComponentProps<typeof Ionicons>["name"],
+      route: "/manageSubscriptions/manageSubscriptions",
+    },
+  ];
 
   return (
     <Gradient styleContainer={{ padding: 20 }}>
@@ -74,31 +91,21 @@ const Profile = () => {
       <View className="bg-white rounded-xl p-6 mb-6 shadow-sm">
         {user ? (
           <>
-            <TouchableOpacity
-              className="flex-row items-center py-4 border-b border-gray-100"
-              onPress={() => router.push("/managebusiness/manageBusiness")}
-            >
-              <View className="bg-teal-100 p-2 rounded-lg mr-4">
-                <Ionicons name="business" size={20} color="#0d9488" />
-              </View>
-              <Text className="flex-1 text-teal-800 font-medium">
-                Manage My Businesses
-              </Text>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="flex-row items-center py-4 border-b border-gray-100"
-              onPress={() => router.push("/managebusiness/savedBusiness")}
-            >
-              <View className="bg-teal-100 p-2 rounded-lg mr-4">
-                <Ionicons name="bookmark" size={20} color="#0d9488" />
-              </View>
-              <Text className="flex-1 text-teal-800 font-medium">
-                Bookmarks
-              </Text>
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
+            {options.map((option) => (
+              <TouchableOpacity
+                key={option.text}
+                className="flex-row items-center py-4 border-b border-gray-100"
+                onPress={() => router.push(option.route as any)}
+              >
+                <View className="bg-teal-100 p-2 rounded-lg mr-4">
+                  <Ionicons name={option.icon} size={20} color="#0d9488" />
+                </View>
+                <Text className="text-teal-800 font-medium flex-1">
+                  {option.text}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+              </TouchableOpacity>
+            ))}
           </>
         ) : (
           <TouchableOpacity

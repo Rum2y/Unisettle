@@ -130,6 +130,28 @@ export default function RootLayout() {
               headerTintColor: "#005965",
             }}
           />
+          <Stack.Screen
+            name="manageSubscriptions/manageSubscriptions"
+            options={{
+              title: "Manage Subscriptions",
+
+              headerStyle: { backgroundColor: "#E0F7FA" },
+              headerTitleStyle: { fontWeight: "bold", fontSize: 20 },
+              headerBackTitle: "Back",
+              headerTintColor: "#005965",
+            }}
+          />
+          <Stack.Screen
+            name="manageSubscriptions/updatePaymentMethod"
+            options={{
+              title: "Update Payment Method",
+              // headerShown: false,
+              headerStyle: { backgroundColor: "#E0F7FA" },
+              headerTitleStyle: { fontWeight: "bold", fontSize: 17 },
+              headerBackTitle: "Back",
+              headerTintColor: "#005965",
+            }}
+          />
         </Stack>
       </AuthProvider>
     </StripeProvider>

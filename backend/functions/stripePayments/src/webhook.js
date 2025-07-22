@@ -19,7 +19,7 @@ export default async function webhook(req, res) {
     event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
     console.error('Error constructing webhook event:', err);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    return res.send(`Webhook Error: ${err.message}`);
   }
 
   const allowedEvents = [
@@ -28,15 +28,15 @@ export default async function webhook(req, res) {
     { id: 'customer.subscription.created' },
     { id: 'customer.subscription.updated' },
     { id: 'customer.subscription.deleted', status: 'canceled' },
+    { id: 'customer.deleted', status: 'deleted' },
   ];
 
+  console.log('Received event:', event.type);
   try {
     const allowedEvent = allowedEvents.find((e) => e.id === event.type);
     if (!allowedEvent) {
       console.warn(`Unhandled event type: ${event.type}`);
-      return res
-        .status(200)
-        .json({ received: true, message: 'Event not handled' });
+      return res.json({ received: true, message: 'Event not handled' });
     }
 
     let customerId;
@@ -59,6 +59,9 @@ export default async function webhook(req, res) {
     }
 
     const customer = await stripe.customers.retrieve(customerId);
+    const currentPeriodEnd =
+      subscription.current_period_end ??
+      subscription.items?.data?.[0]?.current_period_end;
     const users = await databases.listDocuments(
       process.env.APPWRITE_DATABASE_ID,
       process.env.APPWRITE_COLLECTION_ID,
@@ -67,7 +70,7 @@ export default async function webhook(req, res) {
 
     if (users.total === 0) {
       if (event.type === 'customer.subscription.created') {
-        console.log('Creating new user document for customer:', customerId);
+        // Create a new user document if it doesn't exist
         await databases.createDocument(
           process.env.APPWRITE_DATABASE_ID,
           process.env.APPWRITE_COLLECTION_ID,
@@ -82,6 +85,9 @@ export default async function webhook(req, res) {
             freeTrialEnd: subscription.trial_end
               ? new Date(subscription.trial_end * 1000).toISOString()
               : null,
+            nextBillingDate: currentPeriodEnd
+              ? new Date(currentPeriodEnd * 1000).toISOString()
+              : new Date().toISOString(),
           }
         );
         return res.json({ success: true });
@@ -126,11 +132,23 @@ export default async function webhook(req, res) {
           freeTrialEnd: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
             : null,
+          nextBillingDate: currentPeriodEnd
+            ? new Date(currentPeriodEnd * 1000).toISOString()
+            : new Date().toISOString(),
         }
       );
+
       return res.json({ success: true });
     }
 
+    if (event.type === 'customer.deleted') {
+      await databases.deleteDocument(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        userDoc.$id
+      );
+      return res.json({ success: true, message: 'Customer deleted' });
+    }
     return res.json({ received: true, message: 'Event processed' });
   } catch (err) {
     console.error('Error processing webhook:', err);

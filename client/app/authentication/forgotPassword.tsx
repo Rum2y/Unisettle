@@ -30,7 +30,6 @@ const ForgotPassword = () => {
       Alert.alert("Error", "Please enter your email address");
       return;
     }
-
     try {
       setIsSubmitting(true);
       await account.createRecovery(
@@ -43,7 +42,7 @@ const ForgotPassword = () => {
         "Error",
         "Failed to send password reset email. Please try again."
       );
-      console.error("Password recovery error:", error);
+      // console.error("Password recovery error:", error);
     } finally {
       setIsSubmitting(false);
     }

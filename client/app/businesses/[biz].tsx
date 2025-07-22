@@ -74,7 +74,7 @@ const AddBusiness = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mode, setMode] = useState("add");
 
-  const { user, isSubscribed, proUser } = useAuth();
+  const { user, isBusinessSubscribed, businessPlanUser } = useAuth();
 
   useEffect(() => {
     if (biz !== "addBusiness") setMode("edit");

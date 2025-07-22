@@ -11,14 +11,14 @@ type AuthContextType = {
   user: Models.User<Models.Preferences> | null;
   isLoading: boolean;
   unverifiedUser: Models.User<Models.Preferences> | null;
-  isSubscribed: boolean;
-  setIsSubscribed: (value: boolean) => void;
+  isBusinessSubscribed: boolean;
+  setisBusinessSubscribed: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name?: string) => Promise<void>;
   signOut: () => Promise<void>;
   completeVerification: (userId: string, secret: string) => Promise<void>;
   resendVerification: () => Promise<void>;
-  proUser: (
+  businessPlanUser: (
     user: Models.User<Models.Preferences>
   ) => Promise<Models.Document[]>;
 };
@@ -37,7 +37,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<Models.User<Models.Preferences> | null>(
     null
   );
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [isBusinessSubscribed, setisBusinessSubscribed] =
+    useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [unverifiedUser, setUnverifiedUser] =
@@ -52,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const loggedIn = await account.get();
       if (loggedIn.emailVerification) {
         setUser(loggedIn);
-        await proUser(loggedIn);
+        await businessPlanUser(loggedIn);
       } else {
         // If user exists but isn't verified, log them out
         await account.deleteSession("current");
@@ -86,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setUser(loggedInUser);
         setUnverifiedUser(null);
-        await proUser(loggedInUser);
+        await businessPlanUser(loggedInUser);
       }
     } finally {
       setIsLoading(false);
@@ -99,7 +100,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await account.deleteSession("current");
       setUser(null);
       setUnverifiedUser(null);
-      setIsSubscribed(false);
+      setisBusinessSubscribed(false);
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +150,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  async function proUser(user: Models.User<Models.Preferences>) {
+  async function businessPlanUser(user: Models.User<Models.Preferences>) {
     setIsLoading(true);
     try {
       const response = await databases.listDocuments(
@@ -158,7 +159,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         [Query.equal("userId", user.$id)]
       );
 
-      if (response.documents.length > 0) setIsSubscribed(true);
+      if (response.documents.length > 0) setisBusinessSubscribed(true);
       return response.documents;
     } catch (error) {
       console.error("Error checking pro user status:", error);
@@ -178,9 +179,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signUp,
         signOut,
         completeVerification,
-        proUser,
-        isSubscribed,
-        setIsSubscribed,
+        businessPlanUser,
+        isBusinessSubscribed,
+        setisBusinessSubscribed,
         resendVerification,
       }}
     >

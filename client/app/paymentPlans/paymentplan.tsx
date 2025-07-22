@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { router } from "expo-router";
 import { useAuth } from "../context/auth-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,15 +8,15 @@ import { useState, useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const PaymentPlan = () => {
-  const { user, isSubscribed, proUser } = useAuth();
+  const { user, isBusinessSubscribed, businessPlanUser } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
-  const [buttonText, setButtonText] = useState("Start 60-Day Free Trial");
+  const [buttonText, setButtonText] = useState("Start 30-Day Free Trial");
   const [isTrialing, setIsTrialing] = useState(true);
 
   useEffect(() => {
     const checkTrialStatus = async () => {
-      if (isSubscribed && user) {
-        const documents = await proUser(user);
+      if (isBusinessSubscribed && user) {
+        const documents = await businessPlanUser(user);
         if (documents.length > 0) {
           const trialEnd = documents[0].data.freeTrialEnd;
           const isTrialActive = trialEnd
@@ -31,7 +24,7 @@ const PaymentPlan = () => {
             : false;
           setIsTrialing(isTrialActive);
           if (isTrialActive) {
-            setButtonText("Start 60-Day Free Trial");
+            setButtonText("Start 30-Day Free Trial");
           } else {
             setButtonText("Subscribe Now");
           }
@@ -43,7 +36,7 @@ const PaymentPlan = () => {
   const handleSubscribe = () => {
     Alert.alert(
       "Start Free Trial",
-      "Your 60-day free trial will begin immediately. After 60 days, your subscription will automatically renew at $14.99/month until canceled.",
+      "Your 30-day free trial will begin immediately. After 30 days, your subscription will automatically renew at $9.99/month until canceled.",
       [
         {
           text: "Cancel",
@@ -103,7 +96,7 @@ const PaymentPlan = () => {
           </TouchableOpacity>
 
           {/* Annual Plan (optional) */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             className={`flex-row items-center justify-between p-4 rounded-lg border-2 ${
               selectedPlan === "annual"
                 ? "border-teal-500 bg-teal-50"
@@ -120,7 +113,7 @@ const PaymentPlan = () => {
               <Text className="font-bold text-teal-800">$95.90</Text>
               <Text className="text-gray-600">$7.99/month</Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Free Trial Banner */}
@@ -128,9 +121,9 @@ const PaymentPlan = () => {
           <View className="bg-teal-100 rounded-xl p-4 mb-6 flex-row items-center">
             <Ionicons name="gift" size={24} color="#0d9488" className="mr-3" />
             <View>
-              <Text className="font-bold text-teal-800">60-Day Free Trial</Text>
+              <Text className="font-bold text-teal-800">30-Day Free Trial</Text>
               <Text className="text-teal-600">
-                Try all features risk-free for 60 days
+                Try all features risk-free for 30 days
               </Text>
             </View>
           </View>
@@ -210,17 +203,6 @@ const PaymentPlan = () => {
         >
           {buttonText}
         </Button>
-
-        {/* Additional Links */}
-        {/* <View className="flex-row justify-center space-x-4">
-          <TouchableOpacity>
-            <Text className="text-teal-600">Terms of Service</Text>
-          </TouchableOpacity>
-          <Text className="text-gray-400">•</Text>
-          <TouchableOpacity>
-            <Text className="text-teal-600">Privacy Policy</Text>
-          </TouchableOpacity>
-        </View> */}
       </ScrollView>
     </Gradient>
   );

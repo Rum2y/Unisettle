@@ -81,7 +81,6 @@ const AuthScreen = () => {
         if (err?.message?.includes("already exists")) {
           setError("An account with this email already exists.");
         } else {
-          console.error(err);
           setError("Sign Up failed. Please try again.");
         }
       }

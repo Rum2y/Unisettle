@@ -43,13 +43,15 @@ const ManageBusiness = () => {
         BUSINESSREVIEWSCOLLECTIONID,
         [Query.equal("storeid", businessId)]
       );
-      if (reviewsRes.documents.length === 0) return;
-      for (const review of reviewsRes.documents) {
-        await databases.deleteDocument(
-          DATABASEID,
-          BUSINESSREVIEWSCOLLECTIONID,
-          review.$id
-        );
+
+      if (reviewsRes.documents.length > 0) {
+        for (const review of reviewsRes.documents) {
+          await databases.deleteDocument(
+            DATABASEID,
+            BUSINESSREVIEWSCOLLECTIONID,
+            review.$id
+          );
+        }
       }
 
       // 2. Delete all related bookmarks
@@ -58,13 +60,15 @@ const ManageBusiness = () => {
         BOOKMARKSCOLLECTIONID,
         [Query.equal("dataID", businessId)]
       );
-      if (bookmarksRes.documents.length === 0) return;
-      for (const bookmark of bookmarksRes.documents) {
-        await databases.deleteDocument(
-          DATABASEID,
-          BOOKMARKSCOLLECTIONID,
-          bookmark.$id
-        );
+
+      if (bookmarksRes.documents.length > 0) {
+        for (const bookmark of bookmarksRes.documents) {
+          await databases.deleteDocument(
+            DATABASEID,
+            BOOKMARKSCOLLECTIONID,
+            bookmark.$id
+          );
+        }
       }
 
       // 3. Delete the business

@@ -2,25 +2,30 @@ import { View, Text, Alert, ScrollView } from "react-native";
 import { Button } from "react-native-paper";
 import { CardField, useStripe } from "@stripe/stripe-react-native";
 import { useAuth } from "./context/auth-context";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { functions } from "@/lib/appwrite";
 import Gradient from "@/components/gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 const Checkout = () => {
-  const { user, isSubscribed, proUser, setIsSubscribed } = useAuth();
+  const {
+    user,
+    isBusinessSubscribed,
+    businessPlanUser,
+    setisBusinessSubscribed,
+  } = useAuth();
   const [cardDetails, setCardDetails] = useState<any>(null);
   const { confirmPayment, createPaymentMethod, confirmSetupIntent } =
     useStripe();
   const [loading, setLoading] = useState(false);
-  const [buttonText, setButtonText] = useState("Start 60-Day Free Trial");
+  const [buttonText, setButtonText] = useState("Start 30-Day Free Trial");
   const [isTrialing, setIsTrialing] = useState(true);
 
   useEffect(() => {
     const checkTrialStatus = async () => {
-      if (isSubscribed && user) {
-        const documents = await proUser(user);
+      if (isBusinessSubscribed && user) {
+        const documents = await businessPlanUser(user);
         if (documents.length > 0) {
           const trialEnd = documents[0].data.freeTrialEnd;
           const isTrialActive = trialEnd
@@ -120,6 +125,7 @@ const Checkout = () => {
           trial: 60,
           customerId,
           paymentMethodId: paymentMethod.id,
+          use: "createSubscription",
         }),
         false,
         "/createSubscription"
@@ -154,7 +160,7 @@ const Checkout = () => {
       }
 
       // Navigate to a success page or update UI
-      setIsSubscribed(true); // Update subscription status
+      setisBusinessSubscribed(true); // Update subscription status
       router.replace("/businesses/addBusiness");
     } catch (error) {
       Alert.alert(
@@ -199,13 +205,13 @@ const Checkout = () => {
 
           <View className="flex-row justify-between mb-2">
             <Text className="text-gray-600">Price:</Text>
-            <Text className="font-medium text-teal-800">$14.99/month</Text>
+            <Text className="font-medium text-teal-800">$9.99/month</Text>
           </View>
 
           {isTrialing && (
             <View className="flex-row justify-between mb-2">
               <Text className="text-gray-600">Trial Period:</Text>
-              <Text className="font-medium text-teal-800">60 days free</Text>
+              <Text className="font-medium text-teal-800">30 days free</Text>
             </View>
           )}
 
@@ -224,7 +230,7 @@ const Checkout = () => {
           </Text>
 
           <CardField
-            postalCodeEnabled={true}
+            postalCodeEnabled={false}
             placeholders={{
               number: "4242 4242 4242 4242",
               expiration: "MM/YY",
@@ -285,7 +291,7 @@ const Checkout = () => {
           {isTrialing && (
             <Text>
               Your subscription will automatically renew after the trial period
-              at $14.99/month unless canceled.
+              at $9.99/month unless canceled.
             </Text>
           )}
         </Text>
