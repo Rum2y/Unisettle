@@ -73,7 +73,7 @@ const Checkout = () => {
 
       // 2. Create a SetupIntent to save the payment method for future use
       const setupIntent = await functions.createExecution(
-        "687d42c500256eda27f8",
+        process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_ID!,
         JSON.stringify({
           userId: user?.$id,
           email: user?.email,
@@ -115,7 +115,7 @@ const Checkout = () => {
 
       // 4. Call Appwrite Function to handle subscription logic
       const response = await functions.createExecution(
-        "687d42c500256eda27f8",
+        process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_ID!,
         JSON.stringify({
           trial: 60,
           customerId,
