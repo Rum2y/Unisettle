@@ -6,6 +6,7 @@ import {
   BUSINESSESCOLLECTIONID,
   BUSINESSREVIEWSCOLLECTIONID,
   BOOKMARKSCOLLECTIONID,
+  BUSINESS_LOGGED_EVENTS_COLLECTION_ID,
 } from "@/lib/appwrite";
 import { databases } from "@/lib/appwrite";
 import { Query } from "react-native-appwrite";
@@ -14,7 +15,9 @@ import Manage from "@/components/manage";
 const ManageBusiness = () => {
   const { user } = useAuth();
   const [businesses, setBusinesses] = useState<any[]>([]);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [businessStats, setBusinessStats] = useState<
+    Record<string, { calls: number; instagram: number; views: number }>
+  >({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -22,12 +25,36 @@ const ManageBusiness = () => {
     if (!user) return;
     try {
       setLoading(true);
+      // Fetch businesses owned by the user
       const response = await databases.listDocuments(
         DATABASEID,
         BUSINESSESCOLLECTIONID,
         [Query.equal("userID", user.$id)]
       );
       setBusinesses(response.documents);
+
+      // Fetch business stats
+      const statsMap: Record<
+        string,
+        { calls: number; instagram: number; views: number }
+      > = {};
+
+      for (const biz of response.documents) {
+        const eventsRes = await databases.listDocuments(
+          DATABASEID,
+          BUSINESS_LOGGED_EVENTS_COLLECTION_ID,
+          [Query.equal("businessId", biz.$id)]
+        );
+
+        const events = eventsRes.documents;
+        statsMap[biz.$id] = {
+          calls: events.filter((e) => e.type === "call").length,
+          instagram: events.filter((e) => e.type === "instagram").length,
+          views: events.filter((e) => e.type === "view").length,
+        };
+      }
+
+      setBusinessStats(statsMap);
     } catch (error) {
       console.error("Error fetching businesses:", error);
     } finally {
@@ -71,7 +98,24 @@ const ManageBusiness = () => {
         }
       }
 
-      // 3. Delete the business
+      // 3. Delete all logged events for this business
+      const businessStats = await databases.listDocuments(
+        DATABASEID,
+        BUSINESS_LOGGED_EVENTS_COLLECTION_ID,
+        [Query.equal("businessId", businessId)]
+      );
+
+      if (businessStats.documents.length > 0) {
+        for (const event of businessStats.documents) {
+          await databases.deleteDocument(
+            DATABASEID,
+            BUSINESS_LOGGED_EVENTS_COLLECTION_ID,
+            event.$id
+          );
+        }
+      }
+
+      // 4. Delete the business
       await databases.deleteDocument(
         DATABASEID,
         BUSINESSESCOLLECTIONID,
@@ -104,141 +148,6 @@ const ManageBusiness = () => {
     );
   };
 
-  const deleteAllBusinesses = async () => {
-    if (businesses.length === 0) return;
-
-    Alert.alert(
-      "Delete All Businesses",
-      "Are you sure you want to delete ALL your businesses? This will also delete all related reviews and bookmarks. This cannot be undone.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete All",
-          onPress: async () => {
-            setIsDeleting(true);
-            let deletionError = false;
-
-            try {
-              // Process each business sequentially
-              for (const business of businesses) {
-                try {
-                  // 1. Delete all related reviews
-                  try {
-                    const reviewsRes = await databases.listDocuments(
-                      DATABASEID,
-                      BUSINESSREVIEWSCOLLECTIONID,
-                      [Query.equal("storeid", business.$id)]
-                    );
-                    if (reviewsRes.documents) {
-                      // Check if documents exists
-                      for (const review of reviewsRes.documents) {
-                        try {
-                          await databases.deleteDocument(
-                            DATABASEID,
-                            BUSINESSREVIEWSCOLLECTIONID,
-                            review.$id
-                          );
-                        } catch (reviewDeleteError) {
-                          console.error(
-                            `Failed to delete review ${review.$id}:`,
-                            reviewDeleteError
-                          );
-                          deletionError = true;
-                        }
-                      }
-                    }
-                  } catch (reviewsQueryError) {
-                    console.error(
-                      `Failed to query reviews for business ${business.$id}:`,
-                      reviewsQueryError
-                    );
-                    deletionError = true;
-                  }
-
-                  // 2. Delete all related bookmarks
-                  try {
-                    const bookmarksRes = await databases.listDocuments(
-                      DATABASEID,
-                      BOOKMARKSCOLLECTIONID,
-                      [Query.equal("dataID", business.$id)]
-                    );
-                    if (bookmarksRes.documents) {
-                      // Check if documents exists
-                      for (const bookmark of bookmarksRes.documents) {
-                        try {
-                          await databases.deleteDocument(
-                            DATABASEID,
-                            BOOKMARKSCOLLECTIONID,
-                            bookmark.$id
-                          );
-                        } catch (bookmarkDeleteError) {
-                          console.error(
-                            `Failed to delete bookmark ${bookmark.$id}:`,
-                            bookmarkDeleteError
-                          );
-                          deletionError = true;
-                        }
-                      }
-                    }
-                  } catch (bookmarksQueryError) {
-                    console.error(
-                      `Failed to query bookmarks for business ${business.$id}:`,
-                      bookmarksQueryError
-                    );
-                    deletionError = true;
-                  }
-
-                  // 3. Delete the business itself
-                  try {
-                    await databases.deleteDocument(
-                      DATABASEID,
-                      BUSINESSESCOLLECTIONID,
-                      business.$id
-                    );
-                  } catch (businessDeleteError) {
-                    console.error(
-                      `Failed to delete business ${business.$id}:`,
-                      businessDeleteError
-                    );
-                    deletionError = true;
-                  }
-                } catch (businessProcessError) {
-                  console.error(
-                    `Error processing business ${business.$id}:`,
-                    businessProcessError
-                  );
-                  deletionError = true;
-                }
-              }
-
-              // Refresh the list after all deletions
-              await fetchUserBusinesses();
-
-              if (deletionError) {
-                Alert.alert(
-                  "Partial Success",
-                  "All businesses were processed, but some related data might not have been completely deleted."
-                );
-              }
-            } catch (mainError) {
-              console.error("Critical error during bulk deletion:", mainError);
-              Alert.alert(
-                "Error",
-                "A critical error occurred during deletion. Some data might still exist."
-              );
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-          style: "destructive",
-        },
-      ]
-    );
-  };
-
   useEffect(() => {
     fetchUserBusinesses();
   }, [user]);
@@ -251,9 +160,8 @@ const ManageBusiness = () => {
   return (
     <Manage
       businesses={businesses}
+      businessStats={businessStats}
       loading={loading}
-      isDeleting={isDeleting}
-      deleteAllBusinesses={deleteAllBusinesses}
       confirmDelete={confirmDelete}
       edit={true}
       more={false}

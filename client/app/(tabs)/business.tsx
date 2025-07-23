@@ -2,8 +2,14 @@ import BusinessCards from "@/components/businessCards";
 import Filters from "@/components/filter";
 import { LinearGradientComponent } from "@/components/gradient";
 import AuthModal from "@/components/modal";
-import { BUSINESSESCOLLECTIONID, DATABASEID, databases } from "@/lib/appwrite";
+import {
+  BUSINESSESCOLLECTIONID,
+  BUSINESSREVIEWSCOLLECTIONID,
+  DATABASEID,
+  databases,
+} from "@/lib/appwrite";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import logBusinessEvent from "@/loggedEvents/loggedEvents";
 import { router } from "expo-router";
 import debounce from "lodash.debounce";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -55,14 +61,17 @@ const business = () => {
       setLoading(true);
       const filters = [];
 
-      // Apply filters based on selected category
       if (selectedCategory !== "All") {
         filters.push(Query.equal("category", selectedCategory));
       }
 
-      // Apply search query if provided
       if (searchQuery.trim() !== "") {
-        filters.push(Query.search("name", searchQuery.trim()));
+        filters.push(
+          Query.or([
+            Query.search("name", searchQuery.trim()),
+            Query.search("category", searchQuery.trim()),
+          ])
+        );
       }
 
       const response = await databases.listDocuments(
@@ -71,24 +80,47 @@ const business = () => {
         filters
       );
 
-      const businessesWithImages = await Promise.all(
-        response.documents.map(async (business) => {
-          if (business.images && Array.isArray(business.images)) {
-            const previewUrls = await getImages(business, true);
+      // Step 1: Fetch reviews and compute scores
+      const businessesWithScores = await Promise.all(
+        response.documents.map(async (biz) => {
+          // Get preview images
+          const images =
+            biz.images && Array.isArray(biz.images)
+              ? (await getImages(biz, true)).filter(Boolean)
+              : [];
 
-            return {
-              ...business,
-              images: previewUrls.filter(Boolean), // filter out failed ones
-            };
-          }
+          // Fetch reviews for this business
+          const reviewRes = await databases.listDocuments(
+            DATABASEID,
+            BUSINESSREVIEWSCOLLECTIONID,
+            [Query.equal("storeid", biz.$id)]
+          );
 
-          return business;
+          const reviews = reviewRes.documents;
+          const reviewCount = reviews.length;
+          const avgRating =
+            reviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
+            (reviewCount || 1);
+
+          // Optional: You can use a custom score formula here
+          const score = avgRating * Math.log10(reviewCount + 1); // balanced
+
+          return {
+            ...biz,
+            images,
+            score,
+          };
         })
       );
 
-      setBusinesses(businessesWithImages);
+      // Step 2: Sort by score descending
+      const sorted = businessesWithScores.sort((a, b) => b.score - a.score);
 
-      //Fetch Bookmarks
+      setBusinesses(sorted);
+
+      response.documents.forEach((biz) => {
+        logBusinessEvent(biz.$id, "view", user?.$id);
+      });
     } catch (error) {
       console.error("Error fetching businesses:", error);
     } finally {
@@ -185,6 +217,7 @@ const business = () => {
               idx={index}
               refreshReviews={refresh}
               manage={true}
+              userId={user?.$id}
             />
           )}
           ListHeaderComponent={headerComponent}

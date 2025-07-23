@@ -14,7 +14,6 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "@/app/context/auth-context";
-import { Button } from "react-native-paper";
 
 type Business = {
   $id: string;
@@ -22,9 +21,12 @@ type Business = {
 
 type ManageProps = {
   businesses: Business[];
+  businessStats?: Record<
+    string,
+    { calls: number; instagram: number; views: number }
+  >;
   loading: boolean;
-  isDeleting?: boolean;
-  deleteAllBusinesses?: () => void;
+
   confirmDelete?: (id: string) => void;
   edit: boolean;
   handleRemoveFromState?: (id: string) => void;
@@ -36,9 +38,8 @@ type ManageProps = {
 
 const Manage: React.FC<ManageProps> = ({
   businesses,
+  businessStats,
   loading,
-  isDeleting,
-  deleteAllBusinesses,
   confirmDelete,
   edit,
   handleRemoveFromState,
@@ -47,7 +48,7 @@ const Manage: React.FC<ManageProps> = ({
   refresh,
   refreshTrigger,
 }) => {
-  const { user, isBusinessSubscribed } = useAuth();
+  const { isBusinessSubscribed } = useAuth();
 
   return (
     <View className="flex-1 bg-white">
@@ -77,6 +78,9 @@ const Manage: React.FC<ManageProps> = ({
                   idx={index}
                   manage={more}
                   deleteBookmark={condition ? handleRemoveFromState : undefined}
+                  eventStats={
+                    businessStats ? businessStats[item.$id] : undefined
+                  }
                 />
 
                 {edit && (
@@ -157,29 +161,6 @@ const Manage: React.FC<ManageProps> = ({
               )
             }
           />
-          {edit && businesses.length > 0 ? (
-            <View className="mt-6 px-4">
-              <Button
-                mode="outlined"
-                onPress={deleteAllBusinesses}
-                loading={isDeleting}
-                disabled={isDeleting}
-                textColor="#FF3B30"
-                style={{
-                  borderColor: "#FF3B30",
-                  borderWidth: 1.5,
-                  borderRadius: 999,
-                  paddingVertical: 8,
-                  marginBottom: 30,
-                }}
-                contentStyle={{
-                  paddingVertical: 6,
-                }}
-              >
-                {isDeleting ? "Deleting..." : "Delete All Businesses"}
-              </Button>
-            </View>
-          ) : null}
         </View>
       </KeyboardAvoidingView>
     </View>

@@ -171,6 +171,7 @@ function GroceryCard({ store }: { store: GroceryStore }) {
         DATABASEID={DATABASEID}
         COLLECTIONID={STOREREVIEWSCOLLECTIONID}
         data={store}
+        manage={true}
         func={totalRating}
       />
     </View>

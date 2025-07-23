@@ -33,7 +33,7 @@ const Checkout = () => {
             : false;
           setIsTrialing(isTrialActive);
           if (isTrialActive) {
-            setButtonText("Start 60-Day Free Trial");
+            setButtonText("Start 30-Day Free Trial");
           } else {
             setButtonText("Subscribe Now");
           }

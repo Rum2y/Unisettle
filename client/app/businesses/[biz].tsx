@@ -25,6 +25,9 @@ export const categories = [
   "Tailor",
   "Photography",
   "Braider",
+  "Food",
+  "Event Planner",
+  "Lash Artist",
 ];
 
 // Function to pick images from the device

@@ -9,6 +9,7 @@ import {
 import { Card, Button } from "react-native-paper";
 import { useState } from "react";
 import Carousel from "react-native-reanimated-carousel";
+import logBusinessEvent from "@/loggedEvents/loggedEvents";
 import { Ionicons } from "@expo/vector-icons";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
 import { BUSINESSREVIEWSCOLLECTIONID, DATABASEID } from "@/lib/appwrite";
@@ -39,12 +40,16 @@ const BusinessCards = ({
   refreshReviews,
   manage,
   deleteBookmark,
+  userId,
+  eventStats,
 }: {
   biz: Business;
   idx: number;
   refreshReviews?: boolean;
   manage?: boolean;
   deleteBookmark?: (id: string) => void;
+  userId?: string;
+  eventStats?: { calls: number; instagram: number; views: number };
 }) => {
   const [visible, setIsVisible] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
@@ -140,12 +145,37 @@ const BusinessCards = ({
               {biz.category || "Category"}
             </Text>
           </View>
-          {manage && (
+          {manage ? (
             <Bookmark
               data={biz}
               deleteBookmark={deleteBookmark}
               refreshTrigger={refreshReviews}
             />
+          ) : (
+            eventStats && (
+              <View className="mt-4 bg-teal-50 rounded-lg p-3 self-end border border-teal-100">
+                <View className="flex-row items-center gap-4">
+                  <View className="flex-row items-center">
+                    <Ionicons name="call-outline" size={14} color="#0d9488" />
+                    <Text className="text-xs text-teal-800 ml-1 font-medium">
+                      {eventStats.calls}
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Ionicons name="eye-outline" size={14} color="#0d9488" />
+                    <Text className="text-xs text-teal-800 ml-1 font-medium">
+                      {eventStats.views}
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Ionicons name="logo-instagram" size={14} color="#0d9488" />
+                    <Text className="text-xs text-teal-800 ml-1 font-medium">
+                      {eventStats.instagram}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            )
           )}
         </View>
 
@@ -175,11 +205,25 @@ const BusinessCards = ({
           </View>
 
           {biz.instagram !== "N/A" && (
-            <View className="flex-row items-center mb-2">
-              <Ionicons name="logo-instagram" size={16} color="#6b7280" />
-              <Text style={{ marginLeft: 8, color: "#374151" }}>
-                {biz.instagram}
-              </Text>
+            <View className="mb-2">
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL(
+                    `https://instagram.com/${
+                      biz.instagram?.charAt(0) === "@"
+                        ? biz.instagram.slice(1)
+                        : biz.instagram
+                    }`
+                  );
+                  logBusinessEvent(biz.$id || "", "instagram", userId);
+                }}
+                className="flex-row items-center"
+              >
+                <Ionicons name="logo-instagram" size={16} color="teal" />
+                <Text style={{ marginLeft: 8, color: "teal" }}>
+                  {biz.instagram}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -212,6 +256,7 @@ const BusinessCards = ({
             <Button
               mode="contained"
               onPress={() => {
+                logBusinessEvent(biz.$id ?? "", "call", userId);
                 Linking.openURL(`tel:${biz.phoneNumber}`);
               }}
               buttonColor="#14b8a6"

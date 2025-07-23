@@ -74,6 +74,7 @@ const AuthScreen = () => {
         await signUp(email, password, name);
         setIsSignUp(false);
         setEmail("");
+        setName("");
         setPassword("");
         setConfirmPassword("");
         setShowSuccessModal(true);
@@ -88,7 +89,10 @@ const AuthScreen = () => {
       try {
         await signIn(email, password);
         if (!unverifiedUser) router.replace("/(tabs)");
-        else setError("Please verify your email before signing in.");
+        else
+          setError(
+            "Please verify your email before signing in. If you’ve already verified, please try again in a moment."
+          );
       } catch (err: any) {
         if (err?.message?.includes("verify")) {
           setError("Please verify your email before signing in.");
@@ -133,8 +137,8 @@ const AuthScreen = () => {
         </View>
 
         <Text
-          className="text-3xl font-extrabold  mb-6"
-          style={{ textAlign: "center", fontWeight: "600" }}
+          className="text-3xl font-extrabold  mb-6 "
+          style={{ textAlign: "center", fontWeight: "600", color: "#005965" }}
         >
           {isSignUp ? "Create Account" : "Welcome Back"}
         </Text>
@@ -145,10 +149,14 @@ const AuthScreen = () => {
             mode="outlined"
             value={name}
             style={{ marginBottom: 12 }}
-            outlineColor="teal"
-            activeOutlineColor="teal"
-            theme={{ roundness: 10 }}
+            outlineColor="#0d9488"
+            activeOutlineColor="#0d9488"
+            theme={{
+              roundness: 10,
+              colors: { onSurfaceVariant: "rgba(0, 0, 0, 0.3)" },
+            }}
             placeholder="Enter your name"
+            placeholderTextColor="rgba(0, 0, 0, 0.3)"
             onChangeText={setName}
           />
         )}
@@ -158,11 +166,15 @@ const AuthScreen = () => {
           mode="outlined"
           value={email}
           style={{ marginBottom: 12 }}
-          outlineColor="teal"
-          activeOutlineColor="teal"
+          outlineColor="#0d9488"
+          activeOutlineColor="#0d9488"
           placeholder="Enter your email"
+          placeholderTextColor="rgba(0, 0, 0, 0.3)"
           keyboardType="email-address"
-          theme={{ roundness: 10 }}
+          theme={{
+            roundness: 10,
+            colors: { onSurfaceVariant: "rgba(0, 0, 0, 0.3)" },
+          }}
           onChangeText={setEmail}
         />
 
@@ -170,16 +182,20 @@ const AuthScreen = () => {
           label="Password"
           mode="outlined"
           value={password}
-          style={{ marginBottom: 12 }}
-          outlineColor="teal"
-          activeOutlineColor="teal"
+          style={{ marginBottom: isSignUp ? 12 : 0 }}
+          outlineColor="#0d9488"
+          activeOutlineColor="#0d9488"
           placeholder="Enter your password"
-          theme={{ roundness: 10 }}
+          placeholderTextColor="rgba(0, 0, 0, 0.3)"
+          theme={{
+            roundness: 10,
+            colors: { onSurfaceVariant: "rgba(0, 0, 0, 0.3)" },
+          }}
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
           right={
             <TextInput.Icon
-              color="teal"
+              color="#0d9488"
               icon={showPassword ? "eye-off" : "eye"}
               onPress={() => setShowPassword(!showPassword)}
             />
@@ -191,16 +207,20 @@ const AuthScreen = () => {
             label="Confirm Password"
             mode="outlined"
             value={confirmPassword}
-            style={{ marginBottom: 12 }}
-            outlineColor="teal"
-            activeOutlineColor="teal"
-            theme={{ roundness: 10 }}
+            style={{ marginBottom: 20 }}
+            outlineColor="#0d9488"
+            activeOutlineColor="#0d9488"
+            theme={{
+              roundness: 10,
+              colors: { onSurfaceVariant: "rgba(0, 0, 0, 0.3)" },
+            }}
             placeholder="Confirm your password"
+            placeholderTextColor="rgba(0, 0, 0, 0.3)"
             onChangeText={setConfirmPassword}
             secureTextEntry={!showPassword}
             right={
               <TextInput.Icon
-                color="teal"
+                color="#0d9488"
                 icon={showPassword ? "eye-off" : "eye"}
                 onPress={() => setShowPassword(!showPassword)}
               />
@@ -217,10 +237,13 @@ const AuthScreen = () => {
           <View>
             <Button
               mode="text"
-              textColor="teal"
+              textColor="#0d9488"
+              compact
+              contentStyle={{ marginBottom: 10 }}
               labelStyle={{ fontSize: 12 }}
               style={{ alignSelf: "flex-end" }}
               onPress={() => router.push("/authentication/forgotPassword")}
+              rippleColor={"transparent"}
             >
               Forgot Password?
             </Button>
@@ -229,9 +252,10 @@ const AuthScreen = () => {
 
         <Button
           mode="contained"
-          buttonColor="teal"
-          style={{ borderRadius: 17, marginTop: 10, paddingVertical: 7 }}
-          labelStyle={{ fontSize: 16 }}
+          buttonColor="#0d9488"
+          contentStyle={{ paddingVertical: 10 }}
+          style={{ borderRadius: 17 }}
+          labelStyle={{ fontSize: 18, fontWeight: "bold" }}
           onPress={handleAuth}
         >
           {isSignUp ? "Sign Up" : "Sign In"}
@@ -241,7 +265,7 @@ const AuthScreen = () => {
           <Text className="text-base mr-1">
             {isSignUp ? "Already have an account?" : "Don't have an account?"}
           </Text>
-          <Button mode="text" textColor="teal" onPress={handleSwitch}>
+          <Button mode="text" textColor="#0d9488" onPress={handleSwitch}>
             {isSignUp ? "Sign In" : "Sign Up"}
           </Button>
         </View>

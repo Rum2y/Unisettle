@@ -9,6 +9,7 @@ import { CHECKLISTCOLLECTIONID, DATABASEID, databases } from "@/lib/appwrite";
 import { ID, Query } from "react-native-appwrite";
 import Filters from "@/components/filter";
 import { tasks } from "@/tasks";
+import AuthModal from "@/components/modal";
 
 interface Task {
   title: string;
@@ -24,6 +25,7 @@ const Checklist = () => {
   const { user } = useAuth();
 
   const [filter, setFilter] = useState<FilterType>("all");
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCompleted, setShowCompleted] = useState(
     tasks.map((task) => {
       return { ...task, completed: false };
@@ -38,6 +40,10 @@ const Checklist = () => {
   };
 
   const toggleCompletion = (title: string) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
     setShowCompleted((prev) => {
       const updated = [...prev];
       const task = updated.find((task) => task.title === title);
@@ -257,6 +263,10 @@ const Checklist = () => {
           </View>
         ))}
       </View>
+      <AuthModal
+        visible={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </Gradient>
   );
 };

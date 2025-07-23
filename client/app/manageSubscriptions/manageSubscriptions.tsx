@@ -170,11 +170,6 @@ const ManageSubscriptions = () => {
         "Your subscription has been canceled. You will lose access to premium features at the end of your billing period."
       );
       setCancelSubscription(true);
-      if (selectedPlanId === "business") {
-        setBusinessPlan(false);
-      } else {
-        setPremiumPlan(false);
-      }
     } catch (error) {
       console.error("Error canceling subscription:", error);
       Alert.alert("Error", "Failed to cancel subscription. Please try again.");

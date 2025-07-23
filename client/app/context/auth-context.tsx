@@ -166,10 +166,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         [Query.equal("userId", user.$id)]
       );
 
-      if (response.documents.length > 0) setisBusinessSubscribed(true);
+      if (response.documents.length === 0) {
+        return []; // No subscription found
+      }
+
+      const subscription = response.documents[0];
+      const currentDate = new Date();
+
+      // Check Stripe subscription status (active, trialing)
+      const isActive =
+        subscription.status === "active" || subscription.status === "trialing";
+
+      // Check if subscription hasn't expired
+      const isNotExpired = subscription.freeTrialEnd
+        ? new Date(subscription.freeTrialEnd) > currentDate
+        : true;
+
+      setisBusinessSubscribed(isActive && isNotExpired);
       return response.documents;
     } catch (error) {
-      console.error("Error checking pro user status:", error);
+      console.error("Error checking subscription status:", error);
       return [];
     } finally {
       setIsLoading(false);

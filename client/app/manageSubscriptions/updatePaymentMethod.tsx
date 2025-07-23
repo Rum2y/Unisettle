@@ -137,7 +137,7 @@ const UpdatePaymentMethod = () => {
   return (
     <Gradient styleContainer={{ flex: 1, padding: 20 }}>
       {fetchCardDetails ? (
-        <ActivityIndicator />
+        <ActivityIndicator size="large" color="teal" />
       ) : (
         <View className="bg-white rounded-xl p-6 shadow-sm">
           <Text className="text-2xl font-bold text-teal-800 mb-6 text-center">
