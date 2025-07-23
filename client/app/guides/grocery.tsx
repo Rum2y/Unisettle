@@ -30,7 +30,6 @@ interface GroceryStore {
 }
 
 const Grocery = () => {
-  const { user } = useAuth();
   const [groceryData, setGroceryData] = useState<any[] | null>(null);
   const [filterTypes, setFilterTypes] = useState<string[]>([]);
   const [filter, setFilter] = useState<string>("All");

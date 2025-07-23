@@ -17,6 +17,7 @@ export default async function cancelSubscription(req, res) {
   }
 
   try {
+    //Delete the subscription from Stripe
     const deletedSubscription = await stripe.subscriptions.update(
       subscriptionId,
       {
@@ -24,6 +25,7 @@ export default async function cancelSubscription(req, res) {
       }
     );
 
+    // Update the Appwrite document to indicate cancellation
     await databases.updateDocument(
       process.env.APPWRITE_DATABASE_ID,
       process.env.APPWRITE_COLLECTION_ID,

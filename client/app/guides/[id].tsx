@@ -1,8 +1,9 @@
 import PhonePlansGuide from "@/app/guides/phonePlans";
-import { fetchGuideById } from "@/lib/appwrite";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { databases } from "@/lib/appwrite";
+import { DATABASEID, GUIDESCOLLECTIONID } from "@/lib/appwrite";
 import {
   Linking,
   Pressable,
@@ -33,13 +34,40 @@ export default function InfoScreen() {
   useEffect(() => {
     if (!id) return;
 
+    // Function to safely parse JSON strings
+    function safeParse(jsonString: string | null | undefined) {
+      if (!jsonString) return undefined;
+      try {
+        return JSON.parse(jsonString);
+      } catch {
+        return undefined;
+      }
+    }
+
+    // Fetch the guide document from Appwrite
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await fetchGuideById(id);
+        const document = await databases.getDocument(
+          DATABASEID,
+          GUIDESCOLLECTIONID,
+          id
+        );
+
+        const data = {
+          ...document,
+          sections: safeParse(document.sections) ?? [],
+          steps: safeParse(document.steps) ?? [],
+          bankOptions: safeParse(document.bankOptions) ?? [],
+          primaryButton: safeParse(document.primaryButton) ?? null,
+          secondaryButton: safeParse(document.secondaryButton) ?? null,
+          providers: safeParse(document.providers) ?? [],
+          comparisonSites: safeParse(document.comparisonSites) ?? [],
+        };
         setContent(data);
       } catch (error) {
-        console.error("Error fetching guide:", error);
+        console.error("Failed to fetch guide:", error);
+        return null;
       } finally {
         setLoading(false);
       }

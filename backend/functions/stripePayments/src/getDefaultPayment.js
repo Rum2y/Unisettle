@@ -4,10 +4,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export default async function getDefaultPayment(req, res) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   const { email } = body;
+
+  // Validate the email
   const existingCustomer = await stripe.customers.list({
     email,
     limit: 1,
   });
+
   const customerGotten = existingCustomer.data[0];
   if (!customerGotten) {
     return res.json({ error: 'Customer not found' });

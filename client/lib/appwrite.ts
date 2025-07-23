@@ -18,7 +18,7 @@ export const storage = new Storage(client);
 export const functions = new Functions(client);
 
 export const DATABASEID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!;
-const GUIDESCOLLECTIONID =
+export const GUIDESCOLLECTIONID =
   process.env.EXPO_PUBLIC_APPWRITE_GUIDES_COLLECTION_ID!;
 export const CHECKLISTCOLLECTIONID =
   process.env.EXPO_PUBLIC_APPWRITE_CHECKLIST_COLLECTION_ID!;
@@ -38,36 +38,3 @@ export const FEEDBACKCOLLECTIONID =
   process.env.EXPO_PUBLIC_APPWRITE_FEEDBACK_COLLECTION_ID!;
 export const BUSINESS_SUBSCRIPTIONS_COLLECTION_ID =
   process.env.EXPO_PUBLIC_APPWRITE_BUSINESS_SUBSCRIPTIONS_COLLECTION_ID!;
-
-function safeParse(jsonString: string | null | undefined) {
-  if (!jsonString) return undefined;
-  try {
-    return JSON.parse(jsonString);
-  } catch {
-    return undefined;
-  }
-}
-
-export async function fetchGuideById(id: string) {
-  try {
-    const document = await databases.getDocument(
-      DATABASEID,
-      GUIDESCOLLECTIONID,
-      id
-    );
-
-    return {
-      ...document,
-      sections: safeParse(document.sections) ?? [],
-      steps: safeParse(document.steps) ?? [],
-      bankOptions: safeParse(document.bankOptions) ?? [],
-      primaryButton: safeParse(document.primaryButton) ?? null,
-      secondaryButton: safeParse(document.secondaryButton) ?? null,
-      providers: safeParse(document.providers) ?? [],
-      comparisonSites: safeParse(document.comparisonSites) ?? [],
-    };
-  } catch (error) {
-    // console.error("Failed to fetch guide:", error);
-    return null;
-  }
-}

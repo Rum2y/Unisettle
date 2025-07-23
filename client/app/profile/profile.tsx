@@ -1,17 +1,9 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Switch,
-} from "react-native";
+import { View, Text, TouchableOpacity, Alert, Switch } from "react-native";
 import { router } from "expo-router";
 import { useAuth } from "../context/auth-context";
 import { Ionicons } from "@expo/vector-icons";
 import Gradient from "@/components/gradient";
 import { Button } from "react-native-paper";
-import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const Profile = () => {
@@ -121,23 +113,6 @@ const Profile = () => {
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
         )}
-
-        {/* Language Preference */}
-        {/* <View className="flex-row items-center justify-between py-4 border-b border-gray-100">
-          <View className="flex-row items-center">
-            <View className="bg-teal-100 p-2 rounded-lg mr-4">
-              <Ionicons name="language" size={20} color="#0d9488" />
-            </View>
-            <Text className="text-teal-800 font-medium">Language</Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => router.push("/")}
-            className="flex-row items-center"
-          >
-            <Text className="text-gray-600 mr-2">{language}</Text>
-            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-          </TouchableOpacity>
-        </View> */}
 
         {/* Location Preference */}
         <View className="flex-row items-center justify-between py-4 border-b border-gray-100">

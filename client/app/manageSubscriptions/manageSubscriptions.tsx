@@ -117,6 +117,7 @@ const ManageSubscriptions = () => {
     ];
   };
 
+  // Handle plan selection
   const handlePlanPress = (index: number) => {
     setSub(new Array(plans.length).fill(false));
     setSub((prev) => {
@@ -127,10 +128,12 @@ const ManageSubscriptions = () => {
     setSelectedPlanId(plans[index].id);
   };
 
+  // Handle subscription action
   const handleSubscribe = () => {
     router.replace("/paymentPlans/paymentplan");
   };
 
+  // Handle cancel subscription
   const handleCancelSubscription = async () => {
     try {
       setIsLoading(true);
@@ -180,6 +183,7 @@ const ManageSubscriptions = () => {
     }
   };
 
+  // Check if the selected plan is subscribed
   const isPlanSubscribed = () => {
     return selectedPlanId === "business" ? businessPlan : premiumPlan;
   };

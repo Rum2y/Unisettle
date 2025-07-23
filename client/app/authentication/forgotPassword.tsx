@@ -23,8 +23,8 @@ const ForgotPassword = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const router = useRouter();
-  // const { sendPasswordResetEmail } = useAuth();
 
+  // Handle form submission
   const handleSubmit = async () => {
     if (!email.trim()) {
       Alert.alert("Error", "Please enter your email address");
@@ -42,12 +42,12 @@ const ForgotPassword = () => {
         "Error",
         "Failed to send password reset email. Please try again."
       );
-      // console.error("Password recovery error:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Close modal and navigate to sign in
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
     router.replace("/authentication/auth");

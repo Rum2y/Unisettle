@@ -6,6 +6,7 @@ import {
   Alert,
   ScrollView,
   Modal,
+  Linking,
 } from "react-native";
 import Gradient from "@/components/gradient";
 import { Button } from "react-native-paper";
@@ -111,13 +112,7 @@ const FeedbackPage = () => {
                   {
                     text: "Send Email",
                     onPress: () => {
-                      // This would open the user's email client
-                      // Linking.openURL("mailto:feedback@yourapp.com");
-                      Alert.alert(
-                        "Email Not Configured",
-                        "Email feedback option would open your email client.",
-                        [{ text: "OK" }]
-                      );
+                      Linking.openURL("mailto:iyinade64@gmail.com");
                     },
                   },
                 ]

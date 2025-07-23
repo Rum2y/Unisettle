@@ -48,6 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     init();
   }, []);
 
+  // Initialize the authentication context
   async function init() {
     try {
       const loggedIn = await account.get();
@@ -66,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  // Sign in the user with email and password
   async function signIn(email: string, password: string) {
     setIsLoading(true);
     try {
@@ -94,6 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  // Sign out the current user
   async function signOut() {
     setIsLoading(true);
     try {
@@ -106,6 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  // Sign up a new user
   async function signUp(email: string, password: string, name?: string) {
     setIsLoading(true);
     try {
@@ -121,6 +125,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  // Complete verification for unverified users
   async function completeVerification(userId: string, secret: string) {
     setIsLoading(true);
     try {
@@ -135,6 +140,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  // Resend verification email for unverified users
   async function resendVerification() {
     if (!unverifiedUser?.email) {
       throw new Error("No unverified user found");
@@ -150,6 +156,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  // Check if the user has a business plan subscription
   async function businessPlanUser(user: Models.User<Models.Preferences>) {
     setIsLoading(true);
     try {

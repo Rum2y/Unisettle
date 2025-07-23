@@ -10,6 +10,7 @@ export default async function createSubscription(req, res) {
     // 1. Retrieve Customer
     const customer = await stripe.customers.retrieve(customerId);
 
+    //Get the default payment method
     let defaultPaymentMethod =
       customer.invoice_settings?.default_payment_method;
 
@@ -22,8 +23,6 @@ export default async function createSubscription(req, res) {
       await stripe.customers.update(customer.id, {
         invoice_settings: { default_payment_method: paymentMethodId },
       });
-
-      defaultPaymentMethod = paymentMethodId;
     }
 
     if (use === 'createSubscription') {

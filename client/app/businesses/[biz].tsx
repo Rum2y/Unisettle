@@ -27,6 +27,7 @@ export const categories = [
   "Braider",
 ];
 
+// Function to pick images from the device
 export const pickImage = async (
   images: { id?: string; uri: string }[],
   setImages: React.Dispatch<
@@ -74,7 +75,7 @@ const AddBusiness = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mode, setMode] = useState("add");
 
-  const { user, isBusinessSubscribed, businessPlanUser } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (biz !== "addBusiness") setMode("edit");
@@ -86,6 +87,7 @@ const AddBusiness = () => {
     setImages(newImages);
   };
 
+  // Function to upload image to Appwrite storage
   const uploadImage = async (uri: string) => {
     const fileName = uri.split("/").pop() || "business_image.jpg";
     const mimeType = mime.getType(uri) || "image/jpeg";

@@ -23,7 +23,9 @@ const UpdatePaymentMethod = () => {
   const { confirmSetupIntent } = useStripe();
 
   const { user } = useAuth();
+
   useEffect(() => {
+    // Fetch current payment method details
     const fetchCurrentPaymentMethod = async () => {
       if (!user) return;
 
@@ -56,6 +58,7 @@ const UpdatePaymentMethod = () => {
     fetchCurrentPaymentMethod();
   }, [user]);
 
+  // Function to handle payment method change
   const handlePaymentMethodChange = async () => {
     if (!user) return;
     if (!cardComplete) {
