@@ -119,7 +119,9 @@ const business = () => {
       setBusinesses(sorted);
 
       response.documents.forEach((biz) => {
-        logBusinessEvent(biz.$id, "view", user?.$id);
+        if (user?.$id !== biz.userID) {
+          logBusinessEvent(biz.$id, "view", user?.$id);
+        }
       });
     } catch (error) {
       console.error("Error fetching businesses:", error);

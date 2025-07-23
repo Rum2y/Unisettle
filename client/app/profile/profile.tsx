@@ -4,10 +4,13 @@ import { useAuth } from "../context/auth-context";
 import { Ionicons } from "@expo/vector-icons";
 import Gradient from "@/components/gradient";
 import { Button } from "react-native-paper";
+import Constants from "expo-constants";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
+
+  const appVersion = Constants.expoConfig?.version || "1.0.0";
 
   const handleSignOut = () => {
     Alert.alert(
@@ -193,6 +196,10 @@ const Profile = () => {
           </Button>
         </View>
       )}
+      {/* App Version */}
+      <Text className="text-gray-500 text-xs text-center mt-10 ">
+        Version {appVersion}
+      </Text>
     </Gradient>
   );
 };

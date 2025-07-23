@@ -39,11 +39,12 @@ const ManageBusiness = () => {
         { calls: number; instagram: number; views: number }
       > = {};
 
+      const today = new Date().toISOString().slice(0, 7);
       for (const biz of response.documents) {
         const eventsRes = await databases.listDocuments(
           DATABASEID,
           BUSINESS_LOGGED_EVENTS_COLLECTION_ID,
-          [Query.equal("businessId", biz.$id)]
+          [Query.equal("businessId", biz.$id), Query.equal("month", today)]
         );
 
         const events = eventsRes.documents;

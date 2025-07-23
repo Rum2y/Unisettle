@@ -57,8 +57,8 @@ const AuthScreen = () => {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
       return;
     }
 
@@ -304,7 +304,7 @@ const AuthScreen = () => {
               </Text>
               <Text className="text-gray-600 text-center w-full">
                 Check your email for a verification link to complete your
-                registration.
+                registration. Check your spam folder if you don't see it.
               </Text>
             </View>
 

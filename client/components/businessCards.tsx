@@ -153,23 +153,26 @@ const BusinessCards = ({
             />
           ) : (
             eventStats && (
-              <View className="mt-4 bg-teal-50 rounded-lg p-3 self-end border border-teal-100">
+              <View className="bg-teal-50 rounded-lg p-3 border border-teal-100">
+                <Text className="font-bold text-xs mb-2 text-teal-800 text-center">
+                  Monthly Stats:
+                </Text>
                 <View className="flex-row items-center gap-4">
                   <View className="flex-row items-center">
                     <Ionicons name="call-outline" size={14} color="#0d9488" />
-                    <Text className="text-xs text-teal-800 ml-1 font-medium">
+                    <Text className="text-xs text-teal-800 font-bold ml-1">
                       {eventStats.calls}
                     </Text>
                   </View>
                   <View className="flex-row items-center">
                     <Ionicons name="eye-outline" size={14} color="#0d9488" />
-                    <Text className="text-xs text-teal-800 ml-1 font-medium">
+                    <Text className="text-xs text-teal-800 font-bold ml-1">
                       {eventStats.views}
                     </Text>
                   </View>
                   <View className="flex-row items-center">
                     <Ionicons name="logo-instagram" size={14} color="#0d9488" />
-                    <Text className="text-xs text-teal-800 ml-1 font-medium">
+                    <Text className="text-xs text-teal-800 font-bold ml-1">
                       {eventStats.instagram}
                     </Text>
                   </View>
@@ -208,14 +211,18 @@ const BusinessCards = ({
             <View className="mb-2">
               <TouchableOpacity
                 onPress={() => {
-                  Linking.openURL(
-                    `https://instagram.com/${
-                      biz.instagram?.charAt(0) === "@"
-                        ? biz.instagram.slice(1)
-                        : biz.instagram
-                    }`
-                  );
-                  logBusinessEvent(biz.$id || "", "instagram", userId);
+                  if (manage && userId) {
+                    Linking.openURL(
+                      `https://instagram.com/${
+                        biz.instagram?.charAt(0) === "@"
+                          ? biz.instagram.slice(1)
+                          : biz.instagram
+                      }`
+                    );
+                    if (biz.userID !== userId) {
+                      logBusinessEvent(biz.$id || "", "instagram", userId);
+                    }
+                  }
                 }}
                 className="flex-row items-center"
               >
@@ -256,7 +263,9 @@ const BusinessCards = ({
             <Button
               mode="contained"
               onPress={() => {
-                logBusinessEvent(biz.$id ?? "", "call", userId);
+                if (biz.userID !== userId) {
+                  logBusinessEvent(biz.$id || "", "call", userId);
+                }
                 Linking.openURL(`tel:${biz.phoneNumber}`);
               }}
               buttonColor="#14b8a6"

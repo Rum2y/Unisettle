@@ -56,6 +56,10 @@ export default async function createSubscription(req, res) {
       });
     }
 
+    return res.json({
+      message: 'Payment method updated successfully',
+      customerId: customer.id,
+    });
     // 3. Create Subscription
   } catch (err) {
     console.error('Stripe Error:', err.type, err.code, err.message);

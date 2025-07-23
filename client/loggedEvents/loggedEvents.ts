@@ -20,6 +20,7 @@ export default async function logBusinessEvent(
         type,
         userId: userId || null,
         timeStamp: new Date().toISOString(),
+        month: new Date().toISOString().slice(0, 7), // YYYY-MM format
       }
     );
   } catch (err) {
