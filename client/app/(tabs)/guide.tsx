@@ -37,6 +37,11 @@ export default function GuideScreen() {
           icon: "book",
           route: "public-library-card",
         },
+        {
+          label: "Get a Driver's License",
+          icon: "car",
+          route: "drivers-license",
+        },
       ],
     },
   ];

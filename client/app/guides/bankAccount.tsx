@@ -53,6 +53,7 @@ export const shadowStyle = (opacity: number) => {
 
 const BankAccount: React.FC<BankAccountProps> = (content) => {
   const router = useRouter();
+
   return (
     <ScrollView className="flex-1 bg-white p-4">
       {/* Header */}

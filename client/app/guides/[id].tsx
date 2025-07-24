@@ -12,6 +12,7 @@ import {
   Text,
   View,
 } from "react-native";
+import DriversLicence from "./driversLicence";
 import BankAccount from "./bankAccount";
 
 export const shadowStyle = (opacity: number) => {
@@ -48,6 +49,7 @@ export default function InfoScreen() {
     const fetchData = async () => {
       try {
         setLoading(true);
+
         const document = await databases.getDocument(
           DATABASEID,
           GUIDESCOLLECTIONID,
@@ -100,6 +102,9 @@ export default function InfoScreen() {
     return <PhonePlansGuide {...content} />;
   }
 
+  if (content.layout === "drivers") {
+    return <DriversLicence {...content} />;
+  }
   return (
     <ScrollView className="flex-1 bg-white p-4" style={{ paddingBottom: 40 }}>
       {/* Header */}
