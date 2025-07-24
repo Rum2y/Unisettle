@@ -299,12 +299,18 @@ const AuthScreen = () => {
 
             {/* Centered text block */}
             <View className="items-center justify-center mb-4 w-full">
-              <Text className="text-2xl font-bold text-teal-800 text-center mb-2">
+              <Text
+                className="text-2xl"
+                style={{ fontWeight: "600", color: "#0d9488", marginBottom: 8 }}
+              >
                 Account Created!
               </Text>
-              <Text className="text-gray-600 text-center w-full">
+              <Text style={{ textAlign: "center", color: "#4a5568" }}>
                 Check your email for a verification link to complete your
-                registration. Check your spam folder if you don't see it.
+                registration.{" "}
+                <Text style={{ fontWeight: "bold" }}>
+                  Check your spam folder if you don't see it.
+                </Text>
               </Text>
             </View>
 
