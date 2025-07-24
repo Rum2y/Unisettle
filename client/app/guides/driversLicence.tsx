@@ -14,11 +14,6 @@ type SectionContentItem = {
   tips?: string[];
 };
 
-type Section = {
-  title: string;
-  content: SectionContentItem[];
-};
-
 const DriversLicence = ({ sections }: { sections: any[] }) => {
   return (
     <ScrollView className="flex-1 bg-white p-4" style={{ paddingBottom: 40 }}>
