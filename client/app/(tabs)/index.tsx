@@ -18,14 +18,14 @@ export default function Index() {
       id: 1,
       icon: "checkmark-circle",
       routes: "/checklist/checklist",
-      color: "#0d9488", // teal-600
+      color: "#0d9488",
     },
     {
       name: "Tips & Help",
       id: 4,
       icon: "bulb",
       routes: "/guide",
-      color: "#0d9488", // amber-600
+      color: "#0d9488",
     },
   ];
 
@@ -49,6 +49,11 @@ export default function Index() {
       title: "Opening a Bank Account",
       route: "/guides/bank-account",
       icon: "cash" as React.ComponentProps<typeof Ionicons>["name"],
+    },
+    {
+      title: "Get a Phone Plan",
+      route: "/guides/phone-plans",
+      icon: "call" as React.ComponentProps<typeof Ionicons>["name"],
     },
   ];
 

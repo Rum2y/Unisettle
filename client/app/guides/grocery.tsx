@@ -17,7 +17,6 @@ import {
   GROCERYCOLLECTIONID,
   databases,
   STOREREVIEWSCOLLECTIONID,
-  BUSINESSREVIEWSCOLLECTIONID,
 } from "@/lib/appwrite";
 import { Query } from "react-native-appwrite";
 

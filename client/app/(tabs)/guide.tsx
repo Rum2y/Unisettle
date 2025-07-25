@@ -27,7 +27,7 @@ export default function GuideScreen() {
       items: [
         {
           label: "Apply for PGWP",
-          icon: "briefcase", // or something like "document",
+          icon: "briefcase",
           route: "apply-for-pgwp",
         },
       ],

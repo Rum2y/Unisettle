@@ -84,7 +84,7 @@ export default async function webhook(req, res) {
             userId: customer.metadata.userId || '',
             freeTrialEnd: subscription.trial_end
               ? new Date(subscription.trial_end * 1000).toISOString()
-              : null,
+              : '',
             nextBillingDate: currentPeriodEnd
               ? new Date(currentPeriodEnd * 1000).toISOString()
               : new Date().toISOString(),

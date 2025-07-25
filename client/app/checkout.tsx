@@ -24,7 +24,7 @@ const Checkout = () => {
 
   useEffect(() => {
     const checkTrialStatus = async () => {
-      if (isBusinessSubscribed && user) {
+      if (user) {
         const documents = await businessPlanUser(user);
         if (documents.length > 0) {
           const trialEnd = documents[0].data.freeTrialEnd;
@@ -122,7 +122,7 @@ const Checkout = () => {
       const response = await functions.createExecution(
         process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_ID!,
         JSON.stringify({
-          trial: 60,
+          trial: 30,
           customerId,
           paymentMethodId: paymentMethod.id,
           use: "createSubscription",

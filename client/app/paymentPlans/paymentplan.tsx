@@ -8,14 +8,14 @@ import { useState, useEffect } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const PaymentPlan = () => {
-  const { user, isBusinessSubscribed, businessPlanUser } = useAuth();
+  const { user, businessPlanUser } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
   const [buttonText, setButtonText] = useState("Start 30-Day Free Trial");
   const [isTrialing, setIsTrialing] = useState(true);
 
   useEffect(() => {
     const checkTrialStatus = async () => {
-      if (isBusinessSubscribed && user) {
+      if (user) {
         const documents = await businessPlanUser(user);
         if (documents.length > 0) {
           const trialEnd = documents[0].data.freeTrialEnd;
