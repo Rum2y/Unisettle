@@ -34,10 +34,12 @@ export const tasks: Task[] = [
     title: "Learn about PGWP eligibility",
     recommended: "Month 9",
     description: "Check IRCC guidelines and collect transcripts early.",
+    router: "/guides/apply-for-pgwp",
   },
   {
     title: "Explore PR pathways",
     recommended: "Year 2",
     description: "Research Alberta PNP and Express Entry requirements.",
+    router: "/guides/apply-for-pgwp",
   },
 ];

@@ -17,12 +17,9 @@ import { Query } from "react-native-appwrite";
 const ManageSubscriptions = () => {
   const { user, isBusinessSubscribed } = useAuth();
   const [businessPlan, setBusinessPlan] = useState<boolean>(false);
-  const [premiumPlan, setPremiumPlan] = useState<boolean>(false);
   const [cancelSubscription, setCancelSubscription] = useState<boolean>(false);
-  const [sub, setSub] = useState<boolean[]>([true, false]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [nextBillingDate, setNextBillingDate] = useState<string>("");
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("business");
 
   useEffect(() => {
     if (!user) return;
@@ -70,62 +67,37 @@ const ManageSubscriptions = () => {
     fetchSubscription();
   }, [isBusinessSubscribed]);
 
-  const plans = [
-    {
-      id: "business",
-      name: "Business Plan",
-      icon: "business" as React.ComponentProps<typeof Ionicons>["name"],
-      price: "$9.99",
-      period: "month",
-      features: [
-        "Manage your businesses",
-        "Business analytics",
-        "Priority support",
-      ],
-      currentPlan: businessPlan,
-    },
-    {
-      id: "premium",
-      name: "Premium Plan",
-      icon: "rocket" as React.ComponentProps<typeof Ionicons>["name"],
-      price: "$4.99",
-      period: "lifetime",
-      features: ["Ad Free Experience", "AI feature (coming soon)"],
-      currentPlan: premiumPlan,
-    },
-  ];
+  const plan = {
+    id: "business",
+    name: "Business Plan",
+    icon: "business" as React.ComponentProps<typeof Ionicons>["name"],
+    price: "$9.99",
+    period: "month",
+    features: [
+      "Manage your businesses",
+      "Business analytics",
+      "Priority support",
+    ],
+    currentPlan: businessPlan,
+  };
 
-  const getPlanDetails = (planId: string) => {
-    const isSubscribed = planId === "business" ? businessPlan : premiumPlan;
-    const isCancelled = planId === "business" ? cancelSubscription : false;
-
+  const getPlanDetails = () => {
     return [
       {
         header: "Plan",
-        value: `${planId === "business" ? "Business" : "Premium"} Plan`,
+        value: "Business Plan",
       },
       { header: "Billing", value: "Monthly" },
       {
         header: "Next Billing Date",
-        value: isSubscribed
-          ? isCancelled
+        value: businessPlan
+          ? cancelSubscription
             ? "Cancelled"
             : nextBillingDate || "Loading..."
           : "Not subscribed",
       },
       { header: "Payment Method", value: "•••• 4242" },
     ];
-  };
-
-  // Handle plan selection
-  const handlePlanPress = (index: number) => {
-    setSub(new Array(plans.length).fill(false));
-    setSub((prev) => {
-      const newSub = [...prev];
-      newSub[index] = true;
-      return newSub;
-    });
-    setSelectedPlanId(plans[index].id);
   };
 
   // Handle subscription action
@@ -178,11 +150,6 @@ const ManageSubscriptions = () => {
     }
   };
 
-  // Check if the selected plan is subscribed
-  const isPlanSubscribed = () => {
-    return selectedPlanId === "business" ? businessPlan : premiumPlan;
-  };
-
   return (
     <Gradient styleContainer={{ padding: 20 }}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -196,53 +163,60 @@ const ManageSubscriptions = () => {
           </Text>
         </View>
 
-        {/* Plans Grid */}
-        <View className="flex-row flex-wrap justify-between mb-6">
-          {plans.map((plan, index) => (
-            <TouchableOpacity
-              key={plan.id}
-              className={`w-[49%] p-2 rounded-xl mb-4 ${
-                sub[index]
-                  ? "border-2 border-teal-500 bg-teal-50"
-                  : "bg-white border-2 border-gray-200"
-              }`}
-              onPress={() => handlePlanPress(index)}
-            >
-              <View className="flex-row items-center mb-3">
-                <View className="bg-teal-100 p-2 rounded-lg mr-3">
-                  <Ionicons name={plan.icon} size={20} color="#0d9488" />
-                </View>
-                <Text className="font-bold text-teal-800">{plan.name}</Text>
-              </View>
-
-              <Text className="text-2xl font-bold text-teal-800 mb-1">
+        {/* Plan Card */}
+        <View className="w-full p-6 rounded-2xl mb-8 bg-white border border-teal-200 shadow-sm">
+          {/* Plan Header */}
+          <View className="flex-row items-center mb-4">
+            <View className="bg-teal-50 p-3 rounded-xl mr-4 shadow-sm">
+              <Ionicons name={plan.icon} size={24} color="#0d9488" />
+            </View>
+            <View>
+              <Text className="text-xl font-bold text-teal-900">
+                {plan.name}
+              </Text>
+              <Text className="text-3xl font-extrabold text-teal-800 mt-1">
                 {plan.price}
-                <Text className="text-base font-normal text-gray-600">
+                <Text className="text-base font-medium text-gray-500">
                   /{plan.period}
                 </Text>
               </Text>
+            </View>
+          </View>
 
-              <View className="mt-3">
-                {plan.features.map((feature, index) => (
-                  <View key={index} className="flex-row items-start mb-2">
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={16}
-                      color="#0d9488"
-                      style={{ marginTop: 2, marginRight: 6 }}
-                    />
-                    <Text className="text-xs text-teal-800">{feature}</Text>
-                  </View>
-                ))}
-              </View>
+          {/* Divider */}
+          <View className="h-px bg-gray-100 my-4" />
 
-              {plan.currentPlan && (
-                <View className="mt-3 bg-teal-500 rounded-full py-1 px-3 self-start">
-                  <Text className="text-xs text-white">Subscribed</Text>
+          {/* Features List */}
+          <View className="mb-5">
+            <Text className="text-sm font-medium text-gray-500 mb-3">
+              FEATURES
+            </Text>
+            {plan.features.map((feature, index) => (
+              <View key={index} className="flex-row items-center mb-3">
+                <View className="bg-teal-100 p-1 rounded-full mr-3">
+                  <Ionicons name="checkmark" size={14} color="#0d9488" />
                 </View>
-              )}
-            </TouchableOpacity>
-          ))}
+                <Text className="text-sm font-medium text-teal-900">
+                  {feature}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Subscription Badge */}
+          {plan.currentPlan && (
+            <View className="flex-row justify-between items-center bg-teal-50 rounded-lg px-4 py-3 border border-teal-100">
+              <View className="flex-row items-center">
+                <Ionicons name="checkmark-circle" size={18} color="#0d9488" />
+                <Text className="text-sm font-medium text-teal-800 ml-2">
+                  Active Subscription
+                </Text>
+              </View>
+              <Text className="text-xs font-medium text-teal-600 bg-teal-100 rounded-full px-2 py-1">
+                Auto-renewing
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Current Plan Details */}
@@ -251,7 +225,7 @@ const ManageSubscriptions = () => {
             Subscription Details
           </Text>
 
-          {getPlanDetails(selectedPlanId).map((detail) => (
+          {getPlanDetails().map((detail) => (
             <View key={detail.header} className="flex-row justify-between mb-3">
               <Text className="text-gray-600">{detail.header}</Text>
               <Text className="text-teal-800 font-medium">{detail.value}</Text>
@@ -272,7 +246,7 @@ const ManageSubscriptions = () => {
             Update Payment Method
           </Button>
 
-          {isPlanSubscribed() ? (
+          {businessPlan ? (
             <Button
               mode="text"
               onPress={() => {

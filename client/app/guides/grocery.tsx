@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Button } from "react-native-paper";
-import { useAuth } from "../context/auth-context";
 import { useEffect, useState } from "react";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
 import Filters from "@/components/filter";
@@ -18,6 +17,7 @@ import {
   GROCERYCOLLECTIONID,
   databases,
   STOREREVIEWSCOLLECTIONID,
+  BUSINESSREVIEWSCOLLECTIONID,
 } from "@/lib/appwrite";
 import { Query } from "react-native-appwrite";
 
@@ -44,7 +44,29 @@ const Grocery = () => {
           GROCERYCOLLECTIONID,
           filter === "All" ? [] : [Query.equal("type", filter)]
         );
-        setGroceryData(response.documents);
+
+        const promises = response.documents.map(async (doc) => {
+          const reviewRes = await databases.listDocuments(
+            DATABASEID,
+            STOREREVIEWSCOLLECTIONID,
+            [Query.equal("storeid", doc.$id)]
+          );
+          const review =
+            reviewRes.documents.reduce(
+              (acc, curr) => acc + (curr.rating || 0),
+              0
+            ) / Math.max(reviewRes.documents.length, 1);
+
+          doc.averageRating = review;
+          return doc;
+        });
+
+        setGroceryData(
+          (await Promise.all(promises)).sort((a, b) => {
+            return (b.averageRating || 0) - (a.averageRating || 0);
+          })
+        );
+
         if (filterTypes.length === 0) {
           const uniqueTypes = Array.from(
             new Set(response.documents.map((store) => store.type))

@@ -2,18 +2,6 @@ import { View, Text, ScrollView } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
-type SectionContentItem = {
-  type?: string;
-  purpose?: string;
-  notes?: string;
-  subtitle?: string;
-  countries?: string[];
-  requirements?: string[];
-  steps?: string[];
-  rules?: string[];
-  tips?: string[];
-};
-
 const DriversLicence = ({ sections }: { sections: any[] }) => {
   return (
     <ScrollView className="flex-1 bg-white p-4" style={{ paddingBottom: 40 }}>

@@ -23,6 +23,16 @@ export default function GuideScreen() {
       ],
     },
     {
+      title: "After Graduation",
+      items: [
+        {
+          label: "Apply for PGWP",
+          icon: "briefcase", // or something like "document",
+          route: "apply-for-pgwp",
+        },
+      ],
+    },
+    {
       title: "Tips for Life in Canada",
       items: [
         { label: "Surviving Winter", icon: "snow", route: "surviving-winter" },

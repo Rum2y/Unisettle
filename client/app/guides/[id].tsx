@@ -12,6 +12,7 @@ import {
   Text,
   View,
 } from "react-native";
+import PGWPGuideScreen from "@/app/guides/pgwp";
 import DriversLicence from "./driversLicence";
 import BankAccount from "./bankAccount";
 
@@ -104,6 +105,9 @@ export default function InfoScreen() {
 
   if (content.layout === "drivers") {
     return <DriversLicence {...content} />;
+  }
+  if (content.layout === "pgwp") {
+    return <PGWPGuideScreen pgwpGuide={content} />;
   }
   return (
     <ScrollView className="flex-1 bg-white p-4" style={{ paddingBottom: 40 }}>
