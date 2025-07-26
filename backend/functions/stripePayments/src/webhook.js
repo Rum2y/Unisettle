@@ -62,6 +62,9 @@ export default async function webhook(req, res) {
     const currentPeriodEnd =
       subscription.current_period_end ??
       subscription.items?.data?.[0]?.current_period_end;
+    const cancelSubscription =
+      subscription.cancel_at_period_end ??
+      subscription.items?.data?.[0]?.cancel_at_period_end;
     const users = await databases.listDocuments(
       process.env.APPWRITE_DATABASE_ID,
       process.env.APPWRITE_COLLECTION_ID,
@@ -135,6 +138,7 @@ export default async function webhook(req, res) {
           nextBillingDate: currentPeriodEnd
             ? new Date(currentPeriodEnd * 1000).toISOString()
             : new Date().toISOString(),
+          cancellationRequested: cancelSubscription, // Reset cancellation request on update
         }
       );
 

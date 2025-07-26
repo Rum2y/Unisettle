@@ -122,8 +122,8 @@ const Manage: React.FC<ManageProps> = ({
             )}
             ListHeaderComponent={() => (
               <View className="px-4 pt-6 pb-2">
-                <Text className="text-2xl font-bold text-[#005965]">
-                  {edit ? "Manage Your Businesses" : "Your Bookmarks"}
+                <Text className="text-lg font-bold text-[#005965]">
+                  {edit ? "Your Businesses" : "Your Bookmarks"}
                 </Text>
               </View>
             )}

@@ -3,6 +3,7 @@ import createSubscription from './createSubscription.js';
 import webhook from './webhook.js';
 import cancelSubscription from './cancelSubscription.js';
 import getDefaultPayment from './getDefaultPayment.js';
+import updateSubscription from './updateSubscription.js';
 
 export default async ({ req, res }) => {
   if (req.path === '/getDefaultPayment') {
@@ -19,6 +20,9 @@ export default async ({ req, res }) => {
   }
   if (req.path === '/cancelSubscription') {
     return cancelSubscription(req, res);
+  }
+  if (req.path === '/updateSubscription') {
+    return updateSubscription(req, res);
   }
   return res.json({
     message: 'Invalid endpoint',

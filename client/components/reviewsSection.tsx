@@ -1,6 +1,6 @@
-import { View, TextInput } from "react-native";
+import { View, TextInput, Alert, TouchableOpacity } from "react-native";
 import { Button, Text, useTheme } from "react-native-paper";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import StarRating, { StarRatingDisplay } from "react-native-star-rating-widget";
 import { databases } from "@/lib/appwrite";
 import { Query, ID } from "react-native-appwrite";
@@ -55,7 +55,6 @@ const ReviewsSection = ({
       func && func(averageRating, data.$id);
     } catch (error) {
       console.error("Error fetching reviews:", error);
-    } finally {
     }
   };
 
@@ -68,7 +67,7 @@ const ReviewsSection = ({
     else if (!user) {
       setShowAuthModal(true);
       setError("Please sign in to leave a review.");
-      return; // Exit early if user is not authenticated
+      return;
     } else if (rating < 1)
       setError("Please select a rating before submitting.");
     else {
@@ -79,9 +78,10 @@ const ReviewsSection = ({
           text: reviews,
           timestamp: new Date().toISOString(),
           rating: rating,
+          userId: user?.$id,
         };
 
-        await databases.createDocument(
+        const createdReview = await databases.createDocument(
           DATABASEID,
           COLLECTIONID,
           ID.unique(),
@@ -89,11 +89,56 @@ const ReviewsSection = ({
         );
         setReviews("");
         setRating(0);
-        setShowReviews((prev) => [...prev, newReview]);
+        setShowReviews((prev) => [...prev, createdReview]);
         setError(null);
       } catch (error) {
         console.error("Error sending review:", error);
       }
+    }
+  };
+
+  const handleDeleteReview = (reviewId: string) => {
+    if (
+      user?.$id !==
+      showReviews.find((review) => review.$id === reviewId)?.userId
+    )
+      return;
+    Alert.alert(
+      "Delete Review",
+      "Are you sure you want to delete this review?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => confirmDeleteReview(reviewId),
+        },
+      ]
+    );
+  };
+
+  const confirmDeleteReview = async (reviewId: string) => {
+    try {
+      await databases.deleteDocument(
+        DATABASEID,
+        COLLECTIONID,
+        showReviews.find((review) => review.$id === reviewId)?.$id || ""
+      );
+      setShowReviews(showReviews.filter((review) => review.$id !== reviewId));
+      // Recalculate average rating after deletion
+      const updatedReviews = showReviews.filter(
+        (review) => review.$id !== reviewId
+      );
+      const averageRating =
+        updatedReviews.reduce((acc, review) => acc + review.rating, 0) /
+          updatedReviews.length || 0;
+      func && func(averageRating, data.$id);
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      Alert.alert("Error", "Failed to delete the review. Please try again.");
     }
   };
 
@@ -119,9 +164,11 @@ const ReviewsSection = ({
           {showReviews.length > 0 ? (
             <View className="mb-4 space-y-3">
               {showReviews.map((review, index) => (
-                <View
+                <TouchableOpacity
                   key={review.$id || index}
                   className="bg-gray-50 p-3 rounded-lg"
+                  onLongPress={() => handleDeleteReview(review.$id)}
+                  activeOpacity={0.8}
                 >
                   <View className="flex-row justify-between items-start mb-1">
                     <Text className="text-sm font-semibold text-teal-700">
@@ -139,7 +186,7 @@ const ReviewsSection = ({
                     style={{ marginBottom: 4 }}
                   />
                   <Text className="text-sm text-gray-700">{review.text}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           ) : (
@@ -191,7 +238,6 @@ const ReviewsSection = ({
         </View>
       )}
       {/* Auth Modal */}
-
       <AuthModal
         description="Please sign in to leave a review."
         visible={showAuthModal}

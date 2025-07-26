@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { View, Text, ScrollView, Alert } from "react-native";
 import { router } from "expo-router";
 import { useAuth } from "../context/auth-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,10 +20,36 @@ const ManageSubscriptions = () => {
   const [cancelSubscription, setCancelSubscription] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [nextBillingDate, setNextBillingDate] = useState<string>("");
+  const [showPaymentMethod, setShowPaymentMethod] = useState<string>("");
+  const [customerId, setCustomerId] = useState<string>("");
+  const [isReactivating, setIsReactivating] = useState<boolean>(false);
 
   useEffect(() => {
     if (!user) return;
     if (isBusinessSubscribed) setBusinessPlan(true);
+
+    // Fetch default payment method details
+    const fetchCardDetails = async () => {
+      try {
+        const responseCard = await functions.createExecution(
+          process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_ID!,
+          JSON.stringify({
+            email: user?.email,
+          }),
+          false,
+          "/getDefaultPayment"
+        );
+
+        const result = JSON.parse(responseCard.responseBody || "{}");
+        const cardDetails = {
+          last4: result.defaultPaymentMethod?.card.last4,
+        };
+        setShowPaymentMethod(cardDetails.last4 || "");
+      } catch (error) {
+        setShowPaymentMethod("");
+      }
+    };
+    fetchCardDetails();
 
     const fetchSubscription = async () => {
       try {
@@ -35,6 +61,7 @@ const ManageSubscriptions = () => {
 
         if (response.documents.length > 0) {
           const subscription = response.documents[0];
+          setCustomerId(subscription.customerId || "");
           if (subscription.nextBillingDate) {
             const date = new Date(subscription.nextBillingDate);
             setNextBillingDate(
@@ -96,7 +123,7 @@ const ManageSubscriptions = () => {
             : nextBillingDate || "Loading..."
           : "Not subscribed",
       },
-      { header: "Payment Method", value: "•••• 4242" },
+      { header: "Payment Method", value: `•••• ${showPaymentMethod}` },
     ];
   };
 
@@ -150,17 +177,41 @@ const ManageSubscriptions = () => {
     }
   };
 
+  //Reactivate subscription if user is subscribed and has cancelled
+  const reactivateSubscription = async () => {
+    if (!user || !isBusinessSubscribed) return;
+    if (isBusinessSubscribed && cancelSubscription) {
+      try {
+        setIsReactivating(true);
+        await functions.createExecution(
+          process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_ID!,
+          JSON.stringify({
+            customerId: customerId,
+          }),
+          false,
+          "/updateSubscription"
+        );
+        setCancelSubscription(false);
+        Alert.alert(
+          "Subscription Reactivated",
+          "Your subscription has been reactivated. Enjoy your premium features!"
+        );
+      } catch (error) {
+        console.error("Error reactivating subscription:", error);
+      } finally {
+        setIsReactivating(false);
+      }
+    }
+  };
+
   return (
     <Gradient styleContainer={{ padding: 20 }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="items-center mb-8">
+        <View className="items-center mb-2">
           <View className="w-20 h-20 bg-teal-100 rounded-full items-center justify-center mb-4 border-4 border-teal-200">
             <MaterialCommunityIcons name="crown" size={32} color="#0d9488" />
           </View>
-          <Text className="text-2xl font-bold text-teal-800">
-            Manage Subscription
-          </Text>
         </View>
 
         {/* Plan Card */}
@@ -212,8 +263,14 @@ const ManageSubscriptions = () => {
                   Active Subscription
                 </Text>
               </View>
-              <Text className="text-xs font-medium text-teal-600 bg-teal-100 rounded-full px-2 py-1">
-                Auto-renewing
+              <Text
+                className={`text-xs font-medium  ${
+                  cancelSubscription
+                    ? "bg-red-400 text-white"
+                    : "bg-teal-100 text-teal-600"
+                } rounded-full px-2 py-1`}
+              >
+                {cancelSubscription ? "Cancelled" : "Auto-renewing"}
               </Text>
             </View>
           )}
@@ -236,17 +293,17 @@ const ManageSubscriptions = () => {
         {/* Action Buttons */}
         <View className="space-y-3">
           <Button
-            mode="contained"
+            mode="outlined"
             onPress={() =>
               router.push("/manageSubscriptions/updatePaymentMethod")
             }
-            buttonColor="#0d9488"
+            textColor="#0d9488"
             style={{ borderColor: "#0d9488", marginBottom: 10 }}
           >
             Update Payment Method
           </Button>
 
-          {businessPlan ? (
+          {businessPlan && !cancelSubscription ? (
             <Button
               mode="text"
               onPress={() => {
@@ -269,12 +326,20 @@ const ManageSubscriptions = () => {
             </Button>
           ) : (
             <Button
-              mode="outlined"
-              onPress={handleSubscribe}
-              textColor="#0d9488"
+              mode="contained"
+              onPress={
+                cancelSubscription ? reactivateSubscription : handleSubscribe
+              }
+              buttonColor="#0d9488"
               style={{ borderColor: "#0d9488" }}
             >
-              Subscribe
+              {cancelSubscription
+                ? `${
+                    isReactivating
+                      ? "Reactivating..."
+                      : "Reactivate Subscription"
+                  }`
+                : "Subscribe"}
             </Button>
           )}
         </View>

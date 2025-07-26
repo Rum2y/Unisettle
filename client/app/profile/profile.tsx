@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, Alert, Switch } from "react-native";
-import { router } from "expo-router";
+import { StackActions } from "@react-navigation/native";
+import { router, useNavigation } from "expo-router";
 import { useAuth } from "../context/auth-context";
 import { Ionicons } from "@expo/vector-icons";
 import Gradient from "@/components/gradient";
@@ -9,6 +10,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
+  const navigation = useNavigation();
 
   const appVersion = Constants.expoConfig?.version || "1.0.0";
 
@@ -26,6 +28,7 @@ const Profile = () => {
           style: "destructive",
           onPress: () => {
             signOut();
+            navigation.dispatch(StackActions.popToTop());
             router.replace("/authentication/auth");
           },
         },
